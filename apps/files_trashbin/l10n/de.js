@@ -1,4 +1,5 @@
-OC_L10N = {de: {
+OC.L10N.register(
+	'files_trashbin', {
     "Couldn't delete %s permanently" : "Konnte %s nicht dauerhaft löschen",
     "Couldn't restore %s" : "Konnte %s nicht wiederherstellen",
     "Deleted files" : "Gelöschte Dateien",
@@ -9,5 +10,5 @@ OC_L10N = {de: {
     "Name" : "Name",
     "Deleted" : "gelöscht",
     "Delete" : "Löschen"
-},
- PLURAL_FORMS : "nplurals=2; plural=(n != 1);"};
+}, "nplurals=2; plural=(n != 1);"
+);

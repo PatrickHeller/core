@@ -1,4 +1,5 @@
-OC_L10N = {de: {
+OC.L10N.register(
+	'files_sharing', {
     "Server to server sharing is not enabled on this server" : "Der Server für die Serverfreigabe ist auf diesem Server nicht aktiviert",
     "The mountpoint name contains invalid characters." : "Der Name des Einhängepunktes enthält nicht gültige Zeichen.",
     "Invalid or untrusted SSL certificate" : "Ungültiges oder nicht vertrauenswürdiges SSL-Zertifikat",
@@ -35,5 +36,5 @@ OC_L10N = {de: {
     "Remote Shares" : "Entfernte Freigaben",
     "Allow other instances to mount public links shared from this server" : "Andere Instanzen zum Hinzufügen von öffentlichen Links, die über diesen Server Freigegeben werden, erlauben",
     "Allow users to mount public link shares" : "Erlaube Nutzern das Hinzufügen von freigegebenen öffentlichen Links"
-},
- PLURAL_FORMS : "nplurals=2; plural=(n != 1);"};
+}, "nplurals=2; plural=(n != 1);"
+);

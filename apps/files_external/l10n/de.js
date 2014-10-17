@@ -1,4 +1,5 @@
-OC_L10N = {de: {
+OC.L10N.register(
+	'files_external', {
     "Fetching request tokens failed. Verify that your Dropbox app key and secret are correct." : "Anfrage-Token holen fehlgeschlagen. Stelle bitte sicher, dass der Anwendungsschlüssel und Sicherheitsschlüssel für Dropbox korrekt sind.",
     "Fetching access tokens failed. Verify that your Dropbox app key and secret are correct." : "Zugriff-Token holen fehlgeschlagen. Stelle bitte sicher, dass der Anwendungsschlüssel und Sicherheitsschlüssel für Dropbox korrekt sind.",
     "Please provide a valid Dropbox app key and secret." : "Bitte trage einen gültigen Dropbox-App-Key mit Secret ein.",
@@ -68,5 +69,5 @@ OC_L10N = {de: {
     "Delete" : "Löschen",
     "Enable User External Storage" : "Externen Speicher für Benutzer aktivieren",
     "Allow users to mount the following external storage" : "Erlaube es Benutzern, den folgenden externen Speicher einzubinden"
-},
- PLURAL_FORMS : "nplurals=2; plural=(n != 1);"};
+}, "nplurals=2; plural=(n != 1);"
+);

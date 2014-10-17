@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2014 Vincent Petry <pvince81@owncloud.com>
  *
  * This file is licensed under the Affero General Public License version 3
@@ -34,14 +34,13 @@ OC.L10N = {
 	 * @param {{Function|String}} [pluralForm] optional plural function or plural string
 	 */
 	register: function(appName, bundle, pluralForm) {
-		var existingBundle = this._bundles[appName];
-		_.extend(this._bundles[appName] || {}, bundle);
+		this._bundles[appName] = bundle || {};
 
 		if (_.isFunction(pluralForm)) {
 			this._pluralFunctions[appName] = pluralForm;
 		} else {
 			// generate plural function based on form
-			this._pluralForm[appName] = this._generatePluralFunction(pluralForm);
+			this._pluralFunctions[appName] = this._generatePluralFunction(pluralForm);
 		}
 	},
 
@@ -133,7 +132,7 @@ OC.L10N = {
 		if( typeof(value) !== 'undefined' ){
 			var translation = value;
 			if ($.isArray(translation)) {
-				var plural = this._pluralFunction[app](count);
+				var plural = this._pluralFunctions[app](count);
 				return this.translate(app, translation[plural.plural], vars, count);
 			}
 		}

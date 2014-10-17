@@ -1,4 +1,6 @@
-OC_L10N = {de: {
+OC.L10N.register(
+	'files',
+   	{
     "Storage not available" : "Speicher nicht verfügbar",
     "Storage invalid" : "Speicher ungültig",
     "Unknown error" : "Unbekannter Fehler",
@@ -91,5 +93,5 @@ OC_L10N = {de: {
     "The files you are trying to upload exceed the maximum size for file uploads on this server." : "Die Datei überschreitet die Maximalgröße für Uploads auf diesem Server.",
     "Files are being scanned, please wait." : "Dateien werden gescannt, bitte warten.",
     "Currently scanning" : "Durchsuchen läuft"
-},
- PLURAL_FORMS : "nplurals=2; plural=(n != 1);"};
+}, "nplurals=2; plural=(n != 1);"
+);

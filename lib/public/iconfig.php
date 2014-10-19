@@ -51,6 +51,20 @@ interface IConfig {
 	 */
 	public function getSystemValue($key, $default = '');
 
+	/**
+	 * Delete a system wide defined value
+	 *
+	 * @param string $key the key of the value, under which it was saved
+	 */
+	public function deleteSystemValue($key);
+
+	/**
+	 * Get all keys stored for an app
+	 *
+	 * @param string $appName the appName that we stored the value under
+	 * @return string[] the keys stored for the app
+	 */
+	public function getAppKeys($appName);
 
 	/**
 	 * Writes a new app wide value
@@ -71,6 +85,14 @@ interface IConfig {
 	 * @return string the saved value
 	 */
 	public function getAppValue($appName, $key, $default = '');
+
+	/**
+	 * Delete an app wide defined value
+	 *
+	 * @param string $appName the appName that we stored the value under
+	 * @param string $key the key of the value, under which it was saved
+	 */
+	public function deleteAppValue($appName, $key);
 
 
 	/**
@@ -94,4 +116,22 @@ interface IConfig {
 	 * @return string
 	 */
 	public function getUserValue($userId, $appName, $key, $default = '');
+
+	/**
+	 * Get the keys of all stored by an app for the user
+	 *
+	 * @param string $userId the userId of the user that we want to store the value under
+	 * @param string $appName the appName that we stored the value under
+	 * @return string[]
+	 */
+	public function getUserKeys($userId, $appName);
+
+	/**
+	 * Delete a user value
+	 *
+	 * @param string $userId the userId of the user that we want to store the value under
+	 * @param string $appName the appName that we stored the value under
+	 * @param string $key the key under which the value is being stored
+	 */
+	public function deleteUserValue($userId, $appName, $key);
 }

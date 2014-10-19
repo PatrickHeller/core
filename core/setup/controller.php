@@ -22,12 +22,10 @@ class Controller {
 			if(count($e) > 0) {
 				$options = array_merge($opts, $post, $errors);
 				$this->display($options);
-			}
-			else {
+			} else {
 				$this->finishSetup();
 			}
-		}
-		else {
+		} else {
 			$options = array_merge($opts, $post);
 			$this->display($options);
 		}
@@ -53,8 +51,7 @@ class Controller {
 	}
 
 	public function finishSetup() {
-		header( 'Location: '.\OC_Helper::linkToRoute( 'post_setup_check' ));
-		exit();
+		\OC_Util::redirectToDefaultPage();
 	}
 
 	public function loadAutoConfig($post) {
@@ -119,20 +116,27 @@ class Controller {
 
 		$errors = array();
 
-		// Protect data directory here, so we can test if the protection is working
-		\OC_Setup::protectDataDirectory();
-		try {
-			$htaccessWorking = \OC_Util::isHtaccessWorking();
-		} catch (\OC\HintException $e) {
-			$errors[] = array(
-				'error' => $e->getMessage(),
-				'hint' => $e->getHint()
-			);
-			$htaccessWorking = false;
+		// Create data directory to test whether the .htaccess works
+		// Notice that this is not necessarily the same data directory as the one
+		// that will effectively be used.
+		@mkdir($datadir);
+		if (is_dir($datadir) && is_writable($datadir)) {
+			// Protect data directory here, so we can test if the protection is working
+			\OC_Setup::protectDataDirectory();
+
+			try {
+				$htaccessWorking = \OC_Util::isHtaccessWorking();
+			} catch (\OC\HintException $e) {
+				$errors[] = array(
+					'error' => $e->getMessage(),
+					'hint' => $e->getHint()
+				);
+				$htaccessWorking = false;
+			}
 		}
 
 		if (\OC_Util::runningOnMac()) {
-			$l10n = \OC_L10N::get('core');
+			$l10n = \OC::$server->getL10N('core');
 			$themeName = \OC_Util::getTheme();
 			$theme = new \OC_Defaults();
 			$errors[] = array(
@@ -153,7 +157,6 @@ class Controller {
 			'hasMSSQL' => $hasMSSQL,
 			'databases' => $databases,
 			'directory' => $datadir,
-			'secureRNG' => \OC_Util::secureRNGAvailable(),
 			'htaccessWorking' => $htaccessWorking,
 			'vulnerableToNullByte' => $vulnerableToNullByte,
 			'errors' => $errors,

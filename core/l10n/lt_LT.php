@@ -48,6 +48,8 @@ $TRANSLATIONS = array(
 "(all selected)" => "(visi pažymėti)",
 "({count} selected)" => "({count} pažymėtų)",
 "Error loading file exists template" => "Klaida įkeliant esančių failų ruošinį",
+"Your web server is not yet properly setup to allow files synchronization because the WebDAV interface seems to be broken." => "Jūsų serveris nėra tvarkingai nustatytas leisti failų sinchronizaciją, nes WebDAV sąsaja panašu, kad yra sugadinta.",
+"This server has no working internet connection. This means that some of the features like mounting of external storage, notifications about updates or installation of 3rd party apps don´t work. Accessing files from remote and sending of notification emails might also not work. We suggest to enable internet connection for this server if you want to have all features." => "Šis serveris neturi veikiančio ryšio. Tai reiškia, kas kai kurios funkcijos kaip išorinės saugyklos prijungimas, perspėjimai apie atnaujinimus ar trečių šalių programų įdiegimas neveikia. Failų pasiekimas iš kitur ir pranešimų siuntimas el. paštu gali taip pat neveikti. Rekomenduojame įjungti interneto ryšį šiame serveryje, jei norite naudoti visas funkcijas.",
 "Shared" => "Dalinamasi",
 "Share" => "Dalintis",
 "Error" => "Klaida",
@@ -111,15 +113,12 @@ $TRANSLATIONS = array(
 "Error favoriting" => "Klaida įtraukiant į mėgstamus.",
 "Error unfavoriting" => "Klaida pašalinant iš mėgstamų.",
 "Access forbidden" => "Priėjimas draudžiamas",
-"Cloud not found" => "Negalima rasti",
 "Hey there,\n\njust letting you know that %s shared %s with you.\nView it: %s\n\n" => "Labas,\n\nInformuojame, kad %s pasidalino su Jumis %s.\nPažiūrėti tai: %s\n",
 "The share will expire on %s." => "Bendrinimo laikas baigsis %s.",
 "Cheers!" => "Sveikinimai!",
 "Security Warning" => "Saugumo pranešimas",
 "Your PHP version is vulnerable to the NULL Byte attack (CVE-2006-7243)" => "Jūsų PHP versija yra pažeidžiama prieš NULL Byte ataką (CVE-2006-7243)",
 "Please update your PHP installation to use %s securely." => "Prašome atnaujinti savo PHP, kad saugiai naudoti %s.",
-"No secure random number generator is available, please enable the PHP OpenSSL extension." => "Saugaus atsitiktinių skaičių generatoriaus nėra, prašome įjungti PHP OpenSSL modulį.",
-"Without a secure random number generator an attacker may be able to predict password reset tokens and take over your account." => "Be saugaus atsitiktinių skaičių generatoriaus, piktavaliai gali atspėti Jūsų slaptažodį ir pasisavinti paskyrą.",
 "Your data directory and files are probably accessible from the internet because the .htaccess file does not work." => "Jūsų failai yra tikriausiai prieinami per internetą nes .htaccess failas neveikia.",
 "For information how to properly configure your server, please see the <a href=\"%s\" target=\"_blank\">documentation</a>." => "Kad gauti informaciją apie tai kaip tinkamai sukonfigūruoti savo serverį, prašome skaityti <a href=\"%s\" target=\"_blank\">dokumentaciją</a>.",
 "Create an <strong>admin account</strong>" => "Sukurti <strong>administratoriaus paskyrą</strong>",
@@ -133,7 +132,6 @@ $TRANSLATIONS = array(
 "Database host" => "Duomenų bazės serveris",
 "Finish setup" => "Baigti diegimą",
 "Finishing …" => "Baigiama ...",
-"This application requires JavaScript to be enabled for correct operation.  Please <a href=\"http://enable-javascript.com/\" target=\"_blank\">enable JavaScript</a> and re-load this interface." => "Šiai programai reikia įjungti  JavaScript, kad ji veiktų tvarkingai.  Prašome <a href=\"http://enable-javascript.com/\" target=\"_blank\">įjungti JavaScript</a> ir perkrauti šią sąsają.",
 "%s is available. Get more information on how to update." => "%s yra prieinama. Gaukite daugiau informacijos apie atnaujinimą.",
 "Log out" => "Atsijungti",
 "Server side authentication failed!" => "Autentikacija serveryje nepavyko!",
@@ -144,8 +142,6 @@ $TRANSLATIONS = array(
 "This ownCloud instance is currently in single user mode." => "Ši ownCloud sistema yra vieno naudotojo veiksenoje.",
 "This means only administrators can use the instance." => "Tai reiškia, kad tik administratorius gali naudotis sistema.",
 "Contact your system administrator if this message persists or appeared unexpectedly." => "Susisiekite su savo sistemos administratoriumi jei šis pranešimas nedingsta arba jei jis pasirodė netikėtai.",
-"Thank you for your patience." => "Dėkojame už jūsų kantrumą.",
-"This ownCloud instance is currently being updated, which may take a while." => "Šiuo metu vyksta ownCloud atnaujinamas, tai gali šiek tiek užtrukti.",
-"Please reload this page after a short time to continue using ownCloud." => "Po trupučio laiko atnaujinkite šį puslapį kad galėtumėte toliau naudoti ownCloud."
+"Thank you for your patience." => "Dėkojame už jūsų kantrumą."
 );
 $PLURAL_FORMS = "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);";

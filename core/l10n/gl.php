@@ -64,6 +64,8 @@ $TRANSLATIONS = array(
 "So-so password" => "Contrasinal non moi aló",
 "Good password" => "Bo contrasinal",
 "Strong password" => "Contrasinal forte",
+"Your web server is not yet properly setup to allow files synchronization because the WebDAV interface seems to be broken." => "O seu servidor web aínda non está configurado axeidamente para permitir a sincronización de ficheiros xa que semella que a interface WebDAV non está a funcionar.",
+"This server has no working internet connection. This means that some of the features like mounting of external storage, notifications about updates or installation of 3rd party apps don´t work. Accessing files from remote and sending of notification emails might also not work. We suggest to enable internet connection for this server if you want to have all features." => "Este servidor non ten conexión a Internet. Isto significa que algunhas das funcionalidades como a montaxe de almacenamento externo, as notificacións sobre actualizacións ou instalación de aplicacións de terceiros non funcionan. O acceso aos ficheiros de forma remota e o envío de mensaxes de notificación poderían non funcionar. Suxerímoslle que active a conexión a Internet deste servidor se quere dispor de todas as funcionalidades.",
 "Shared" => "Compartido",
 "Shared with {recipients}" => "Compartido con {recipients}",
 "Share" => "Compartir",
@@ -138,15 +140,12 @@ $TRANSLATIONS = array(
 "Error favoriting" => "Produciuse un erro ao marcar como favorito",
 "Error unfavoriting" => "Produciuse un erro ao desmarcar como favorito",
 "Access forbidden" => "Acceso denegado",
-"Cloud not found" => "Nube non atopada",
 "Hey there,\n\njust letting you know that %s shared %s with you.\nView it: %s\n\n" => "Ola,\n\nsó facerlle saber que %s compartiu %s con vostede.\nVéxao en: %s\n\n",
 "The share will expire on %s." => "Esta compartición caduca o %s.",
 "Cheers!" => "Saúdos!",
 "Security Warning" => "Aviso de seguranza",
 "Your PHP version is vulnerable to the NULL Byte attack (CVE-2006-7243)" => "A súa versión de PHP é vulnerábel a un ataque de byte nulo (CVE-2006-7243)",
 "Please update your PHP installation to use %s securely." => "Actualice a instalación de PHP para empregar %s de xeito seguro.",
-"No secure random number generator is available, please enable the PHP OpenSSL extension." => "Non hai un xerador de números ao chou dispoñíbel. Active o engadido de OpenSSL para PHP.",
-"Without a secure random number generator an attacker may be able to predict password reset tokens and take over your account." => "Sen un xerador seguro de números ao chou podería acontecer que predicindo as cadeas de texto de reinicio de contrasinais se afagan coa súa conta.",
 "Your data directory and files are probably accessible from the internet because the .htaccess file does not work." => "O seu directorio de datos e os ficheiros probabelmente sexan accesíbeis desde a Internet xa que o ficheiro .htaccess non está a traballar.",
 "For information how to properly configure your server, please see the <a href=\"%s\" target=\"_blank\">documentation</a>." => "Para obter información sobre como como configurar axeitadamente o seu servidor, vexa a <a href=\"%s\" target=\"_blank\">documentación</a>.",
 "Create an <strong>admin account</strong>" => "Crear unha <strong>contra de administrador</strong>",
@@ -163,7 +162,6 @@ $TRANSLATIONS = array(
 "SQLite will be used as database. For larger installations we recommend to change this." => "Empregarase SQLite como base de datos. Para instalacións máis grandes recomendámoslle que cambie isto.",
 "Finish setup" => "Rematar a configuración",
 "Finishing …" => "Rematando ...",
-"This application requires JavaScript to be enabled for correct operation.  Please <a href=\"http://enable-javascript.com/\" target=\"_blank\">enable JavaScript</a> and re-load this interface." => "Esta aplicación require que o JavaScript estea activado para unha operativa correcta. <a href=\"http://enable-javascript.com/\" target=\"_blank\">Active o JavaScript</a> e volva a cargar a interface.",
 "%s is available. Get more information on how to update." => "%s está dispoñíbel. Obteña máis información sobre como actualizar.",
 "Log out" => "Desconectar",
 "Server side authentication failed!" => "A autenticación fracasou do lado do servidor!",
@@ -184,8 +182,6 @@ $TRANSLATIONS = array(
 "The theme %s has been disabled." => "O tema %s foi desactivado.",
 "Please make sure that the database, the config folder and the data folder have been backed up before proceeding." => "Asegúrese de ter feito unha copia de seguranza da base de datos, do cartafol de configuración e do cartafol de datos, antes de proceder.",
 "Start update" => "Iniciar a actualización",
-"To avoid timeouts with larger installations, you can instead run the following command from your installation directory:" => "Para evitar tempos de espera nas instalacións grandes, no seu lugar pode executar a seguinte orde desde o directorio de instalación:",
-"This ownCloud instance is currently being updated, which may take a while." => "Esta instancia do ownCloud está actualizandose neste momento, pode levarlle un chisco.",
-"Please reload this page after a short time to continue using ownCloud." => "Volva cargar a páxina de aquí a pouco para para continuar co ownCloud."
+"To avoid timeouts with larger installations, you can instead run the following command from your installation directory:" => "Para evitar tempos de espera nas instalacións grandes, no seu lugar pode executar a seguinte orde desde o directorio de instalación:"
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n != 1);";

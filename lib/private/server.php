@@ -6,11 +6,15 @@ use OC\AppFramework\Http\Request;
 use OC\AppFramework\Db\Db;
 use OC\AppFramework\Utility\SimpleContainer;
 use OC\Cache\UserCache;
+use OC\Security\CertificateManager;
 use OC\DB\ConnectionWrapper;
 use OC\Files\Node\Root;
 use OC\Files\View;
+use OC\Security\Crypto;
+use OC\Security\SecureRandom;
 use OCP\IServerContainer;
 use OCP\ISession;
+use OC\Tagging\TagMapper;
 
 /**
  * Class Server
@@ -65,9 +69,13 @@ class Server extends SimpleContainer implements IServerContainer {
 		$this->registerService('PreviewManager', function ($c) {
 			return new PreviewManager();
 		});
+		$this->registerService('TagMapper', function($c) {
+			return new TagMapper($c->getDb());
+		});
 		$this->registerService('TagManager', function ($c) {
+			$tagMapper = $c->query('TagMapper');
 			$user = \OC_User::getUser();
-			return new TagManager($user);
+			return new TagManager($tagMapper, $user);
 		});
 		$this->registerService('RootFolder', function ($c) {
 			// TODO: get user and user manager from container as well
@@ -200,8 +208,18 @@ class Server extends SimpleContainer implements IServerContainer {
 		$this->registerService('Search', function ($c) {
 			return new Search();
 		});
+		$this->registerService('SecureRandom', function($c) {
+			return new SecureRandom();
+		});
+		$this->registerService('Crypto', function($c) {
+			return new Crypto(\OC::$server->getConfig(), \OC::$server->getSecureRandom());
+		});
 		$this->registerService('Db', function ($c) {
 			return new Db();
+		});
+		$this->registerService('HTTPHelper', function (SimpleContainer $c) {
+			$config = $c->query('AllConfig');
+			return new HTTPHelper($config);
 		});
 	}
 
@@ -263,14 +281,18 @@ class Server extends SimpleContainer implements IServerContainer {
 	/**
 	 * Returns a view to ownCloud's files folder
 	 *
+	 * @param string $userId user ID
 	 * @return \OCP\Files\Folder
 	 */
-	function getUserFolder() {
-		$user = $this->getUserSession()->getUser();
-		if (!$user) {
-			return null;
+	function getUserFolder($userId = null) {
+		if($userId === null) {
+			$user = $this->getUserSession()->getUser();
+			if (!$user) {
+				return null;
+			}
+			$userId = $user->getUID();
 		}
-		$dir = '/' . $user->getUID();
+		$dir = '/' . $userId;
 		$root = $this->getRootFolder();
 		$folder = null;
 
@@ -369,10 +391,11 @@ class Server extends SimpleContainer implements IServerContainer {
 	 * get an L10N instance
 	 *
 	 * @param string $app appid
+	 * @param string $lang
 	 * @return \OC_L10N
 	 */
-	function getL10N($app) {
-		return $this->query('L10NFactory')->get($app);
+	function getL10N($app, $lang = null) {
+		return $this->query('L10NFactory')->get($app, $lang);
 	}
 
 	/**
@@ -462,11 +485,63 @@ class Server extends SimpleContainer implements IServerContainer {
 	}
 
 	/**
+	 * Returns a SecureRandom instance
+	 *
+	 * @return \OCP\Security\ISecureRandom
+	 */
+	function getSecureRandom() {
+		return $this->query('SecureRandom');
+	}
+
+	/**
+	 * Returns a Crypto instance
+	 *
+	 * @return \OCP\Security\ICrypto
+	 */
+	function getCrypto() {
+		return $this->query('Crypto');
+	}
+
+	/**
 	 * Returns an instance of the db facade
 	 *
 	 * @return \OCP\IDb
 	 */
 	function getDb() {
 		return $this->query('Db');
+	}
+
+	/**
+	 * Returns an instance of the HTTP helper class
+	 * @return \OC\HTTPHelper
+	 */
+	function getHTTPHelper() {
+		return $this->query('HTTPHelper');
+	}
+
+	/**
+	 * Get the certificate manager for the user
+	 *
+	 * @param \OCP\IUser $user (optional) if not specified the current loggedin user is used
+	 * @return \OCP\ICertificateManager
+	 */
+	function getCertificateManager($user = null) {
+		if (is_null($user)) {
+			$userSession = $this->getUserSession();
+			$user = $userSession->getUser();
+			if (is_null($user)) {
+				return null;
+			}
+		}
+		return new CertificateManager($user);
+	}
+
+	/**
+	 * Create a new event source
+	 *
+	 * @return \OCP\IEventSource
+	 */
+	function createEventSource() {
+		return new \OC_EventSource();
 	}
 }

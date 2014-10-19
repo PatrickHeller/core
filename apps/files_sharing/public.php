@@ -1,5 +1,7 @@
 <?php
 // Load other apps for file previews
+use OCA\Files_Sharing\Helper;
+
 OC_App::loadApps();
 
 $appConfig = \OC::$server->getAppConfig();
@@ -11,8 +13,12 @@ if ($appConfig->getValue('core', 'shareapi_allow_links', 'yes') !== 'yes') {
 	exit();
 }
 
+// Legacy sharing links via public.php have the token in $GET['t']
 if (isset($_GET['t'])) {
 	$token = $_GET['t'];
+}
+
+if (isset($token)) {
 	$linkItem = OCP\Share::getShareByToken($token, false);
 	if (is_array($linkItem) && isset($linkItem['uid_owner'])) {
 		// seems to be a valid share
@@ -105,10 +111,10 @@ if (isset($path)) {
 			\OC::$server->getSession()->close();
 		}
 		if (isset($_GET['files'])) { // download selected files
-			$files = urldecode($_GET['files']);
+			$files = $_GET['files'];
 			$files_list = json_decode($files);
 			// in case we get only a single file
-			if ($files_list === NULL ) {
+			if (!is_array($files_list)) {
 				$files_list = array($files);
 			}
 			OC_Files::get($path, $files_list, $_SERVER['REQUEST_METHOD'] == 'HEAD');
@@ -132,6 +138,7 @@ if (isset($path)) {
 		$tmpl->assign('mimetype', \OC\Files\Filesystem::getMimeType($path));
 		$tmpl->assign('dirToken', $linkItem['token']);
 		$tmpl->assign('sharingToken', $token);
+		$tmpl->assign('server2serversharing', Helper::isOutgoingServer2serverShareEnabled());
 		$tmpl->assign('protected', isset($linkItem['share_with']) ? 'true' : 'false');
 
 		$urlLinkIdentifiers= (isset($token)?'&t='.$token:'')

@@ -56,7 +56,7 @@ class OC_Template extends \OC\Template\Base {
 		$requesttoken = (OC::$server->getSession() and $registerCall) ? OC_Util::callRegister() : '';
 
 		$parts = explode('/', $app); // fix translation when app is something like core/lostpassword
-		$l10n = OC_L10N::get($parts[0]);
+		$l10n = \OC::$server->getL10N($parts[0]);
 		$themeDefaults = new OC_Defaults();
 
 		list($path, $template) = $this->findTemplate($theme, $app, $name, $fext);
@@ -198,8 +198,8 @@ class OC_Template extends \OC\Template\Base {
 	 * Includes another template. use <?php echo $this->inc('template'); ?> to
 	 * do this.
 	 */
-	public function inc( $file, $additionalparams = null ) {
-		return $this->load($this->path.$file.'.php', $additionalparams);
+	public function inc( $file, $additionalParams = null ) {
+		return $this->load($this->path.$file.'.php', $additionalParams);
 	}
 
 	/**
@@ -250,8 +250,7 @@ class OC_Template extends \OC\Template\Base {
 	/**
 		* Print a fatal error page and terminates the script
 		* @param string $error_msg The error message to show
-		* @param string $hint An optional hint message
-		* Warning: All data passed to $hint needs to get sanitized using OC_Util::sanitizeHTML
+		* @param string $hint An optional hint message - needs to be properly escaped
 		*/
 	public static function printErrorPage( $error_msg, $hint = '' ) {
 		$content = new \OC_Template( '', 'error', 'error', false );
@@ -266,28 +265,46 @@ class OC_Template extends \OC\Template\Base {
 	 * @param Exception $exception
 	 */
 	public static function printExceptionErrorPage(Exception $exception) {
-		$error_msg = $exception->getMessage();
-		if ($exception->getCode()) {
-			$error_msg = '['.$exception->getCode().'] '.$error_msg;
-		}
-		if (defined('DEBUG') and DEBUG) {
-			$hint = $exception->getTraceAsString();
-			if (!empty($hint)) {
-				$hint = '<pre>'.OC_Util::sanitizeHTML($hint).'</pre>';
-			}
-			while (method_exists($exception, 'previous') && $exception = $exception->previous()) {
-				$error_msg .= '<br/>Caused by:' . ' ';
-				if ($exception->getCode()) {
-					$error_msg .= '['.OC_Util::sanitizeHTML($exception->getCode()).'] ';
-				}
-				$error_msg .= OC_Util::sanitizeHTML($exception->getMessage());
-			};
-		} else {
-			$hint = '';
-			if ($exception instanceof \OC\HintException) {
-				$hint = OC_Util::sanitizeHTML($exception->getHint());
-			}
-		}
-		self::printErrorPage($error_msg, $hint);
+		$content = new \OC_Template('', 'exception', 'error', false);
+		$content->assign('errorMsg', $exception->getMessage());
+		$content->assign('errorCode', $exception->getCode());
+		$content->assign('file', $exception->getFile());
+		$content->assign('line', $exception->getLine());
+		$content->assign('trace', $exception->getTraceAsString());
+		$content->assign('debugMode', defined('DEBUG') && DEBUG === true);
+		$content->assign('remoteAddr', OC_Request::getRemoteAddress());
+		$content->assign('requestID', OC_Request::getRequestID());
+		$content->printPage();
+		die();
 	}
+
+	/**
+	 * @return bool
+	 */
+	public static function isAssetPipelineEnabled() {
+		// asset management enabled?
+		$useAssetPipeline = \OC::$server->getConfig()->getSystemValue('asset-pipeline.enabled', false);
+		if (!$useAssetPipeline) {
+			return false;
+		}
+
+		// assets folder exists?
+		$assetDir = \OC::$SERVERROOT . '/assets';
+		if (!is_dir($assetDir)) {
+			if (!mkdir($assetDir)) {
+				\OCP\Util::writeLog('assets',
+					"Folder <$assetDir> does not exist and/or could not be generated.", \OCP\Util::ERROR);
+				return false;
+			}
+		}
+
+		// assets folder can be accessed?
+		if (!touch($assetDir."/.oc")) {
+			\OCP\Util::writeLog('assets',
+				"Folder <$assetDir> could not be accessed.", \OCP\Util::ERROR);
+			return false;
+		}
+		return $useAssetPipeline;
+	}
+
 }

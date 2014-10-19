@@ -443,15 +443,33 @@ class Test_Helper extends PHPUnit_Framework_TestCase {
 	public function testLinkToPublic() {
 		\OC::$WEBROOT = '';
 		$result = \OC_Helper::linkToPublic('files');
-		$this->assertEquals('http://localhost/public.php?service=files', $result);
+		$this->assertEquals('http://localhost/s', $result);
 		$result = \OC_Helper::linkToPublic('files', false);
-		$this->assertEquals('http://localhost/public.php?service=files', $result);
+		$this->assertEquals('http://localhost/s', $result);
+		$result = \OC_Helper::linkToPublic('files', true);
+		$this->assertEquals('http://localhost/s/', $result);
+
+		$result = \OC_Helper::linkToPublic('other');
+		$this->assertEquals('http://localhost/public.php?service=other', $result);
+		$result = \OC_Helper::linkToPublic('other', false);
+		$this->assertEquals('http://localhost/public.php?service=other', $result);
+		$result = \OC_Helper::linkToPublic('other', true);
+		$this->assertEquals('http://localhost/public.php?service=other/', $result);
 
 		\OC::$WEBROOT = '/owncloud';
 		$result = \OC_Helper::linkToPublic('files');
-		$this->assertEquals('http://localhost/owncloud/public.php?service=files', $result);
+		$this->assertEquals('http://localhost/owncloud/s', $result);
 		$result = \OC_Helper::linkToPublic('files', false);
-		$this->assertEquals('http://localhost/owncloud/public.php?service=files', $result);
+		$this->assertEquals('http://localhost/owncloud/s', $result);
+		$result = \OC_Helper::linkToPublic('files', true);
+		$this->assertEquals('http://localhost/owncloud/s/', $result);
+
+		$result = \OC_Helper::linkToPublic('other');
+		$this->assertEquals('http://localhost/owncloud/public.php?service=other', $result);
+		$result = \OC_Helper::linkToPublic('other', false);
+		$this->assertEquals('http://localhost/owncloud/public.php?service=other', $result);
+		$result = \OC_Helper::linkToPublic('other', true);
+		$this->assertEquals('http://localhost/owncloud/public.php?service=other/', $result);
 	}
 
 	/**
@@ -477,5 +495,33 @@ class Test_Helper extends PHPUnit_Framework_TestCase {
 
 		\OC_Helper::rmdirr($baseDir);
 		$this->assertFalse(file_exists($baseDir));
+	}
+
+	/**
+	 * Allows us to test private methods/properties
+	 *
+	 * @param $object
+	 * @param $methodName
+	 * @param array $parameters
+	 * @return mixed
+	 */
+	public static function invokePrivate($object, $methodName, array $parameters = array()) {
+		$reflection = new ReflectionClass(get_class($object));
+
+		if ($reflection->hasMethod($methodName)) {
+			$method = $reflection->getMethod($methodName);
+
+			$method->setAccessible(true);
+
+			return $method->invokeArgs($object, $parameters);
+		} elseif ($reflection->hasProperty($methodName)) {
+			$property = $reflection->getProperty($methodName);
+
+			$property->setAccessible(true);
+
+			return $property->getValue($object);
+		}
+
+		return false;
 	}
 }

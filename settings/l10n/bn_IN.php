@@ -1,8 +1,8 @@
 <?php
 $TRANSLATIONS = array(
 "Saved" => "সংরক্ষিত",
-"Error" => "ভুল",
 "Delete" => "মুছে ফেলা",
+"by" => "দ্বারা",
 "Get the apps to sync your files" => "আপনার ফাইল সিঙ্ক করার অ্যাপ পান",
 "Cancel" => "বাতিল করা",
 "Username" => "ইউজারনেম"

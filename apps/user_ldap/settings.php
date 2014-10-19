@@ -26,6 +26,7 @@
 OC_Util::checkAdminUser();
 
 OCP\Util::addScript('user_ldap', 'ldapFilter');
+OCP\Util::addScript('user_ldap', 'experiencedAdmin');
 OCP\Util::addScript('user_ldap', 'settings');
 OCP\Util::addScript('core', 'jquery.multiselect');
 OCP\Util::addStyle('user_ldap', 'settings');
@@ -46,7 +47,7 @@ $wControls = $wControls->fetchPage();
 $sControls = new OCP\Template('user_ldap', 'part.settingcontrols');
 $sControls = $sControls->fetchPage();
 
-$l = \OC_L10N::get('user_ldap');
+$l = \OC::$server->getL10N('user_ldap');
 
 $wizTabs = array();
 $wizTabs[] = array('tpl' => 'part.wizard-server',      'cap' => $l->t('Server'));

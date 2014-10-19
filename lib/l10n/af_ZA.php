@@ -6,9 +6,11 @@ $TRANSLATIONS = array(
 "Users" => "Gebruikers",
 "Admin" => "Admin",
 "Unknown filetype" => "Onbekende leertipe",
+"Invalid image" => "Ongeldige prent",
 "web services under your control" => "webdienste onder jou beheer",
 "_%n minute ago_::_%n minutes ago_" => array("",""),
 "_%n hour ago_::_%n hours ago_" => array("","%n ure gelede"),
+"today" => "vandag",
 "_%n day go_::_%n days ago_" => array("","%n dae gelede"),
 "_%n month ago_::_%n months ago_" => array("","%n maande gelede")
 );

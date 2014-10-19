@@ -1,13 +1,21 @@
 <?php
 $TRANSLATIONS = array(
+"Unknown error" => "Neznámá chyba",
+"Missing recovery key password" => "Chybí heslo klíče pro obnovu",
+"Please repeat the recovery key password" => "Zopakujte prosím heslo klíče pro obnovu",
+"Repeated recovery key password does not match the provided recovery key password" => "Opakované heslo pro obnovu nesouhlasí se zadaným heslem",
 "Recovery key successfully enabled" => "Záchranný klíč byl úspěšně povolen",
-"Could not enable recovery key. Please check your recovery key password!" => "Nepodařilo se povolit záchranný klíč. Zkontrolujte prosím vaše heslo záchranného klíče!",
-"Recovery key successfully disabled" => "Záchranný klíč byl úspěšně zakázán",
 "Could not disable recovery key. Please check your recovery key password!" => "Nelze zakázat záchranný klíč. Zkontrolujte prosím heslo vašeho záchranného klíče!",
+"Recovery key successfully disabled" => "Záchranný klíč byl úspěšně zakázán",
+"Please provide the old recovery password" => "Zapište prosím staré heslo pro obnovu",
+"Please provide a new recovery password" => "Zapište prosím nové heslo pro obnovu",
+"Please repeat the new recovery password" => "Zopakujte prosím nové heslo pro obnovu",
 "Password successfully changed." => "Heslo bylo úspěšně změněno.",
 "Could not change the password. Maybe the old password was not correct." => "Změna hesla se nezdařila. Pravděpodobně nebylo stávající heslo zadáno správně.",
 "Private key password successfully updated." => "Heslo soukromého klíče úspěšně aktualizováno.",
 "Could not update the private key password. Maybe the old password was not correct." => "Nelze aktualizovat heslo soukromého klíče. Možná nebylo staré heslo správně.",
+"File recovery settings updated" => "Možnosti záchrany souborů aktualizovány",
+"Could not update file recovery" => "Nelze nastavit záchranu souborů",
 "Encryption app not initialized! Maybe the encryption app was re-enabled during your session. Please try to log out and log back in to initialize the encryption app." => "Aplikace pro šifrování není inicializována! Je možné, že aplikace byla znovu aktivována během vašeho přihlášení. Zkuste se prosím odhlásit a znovu přihlásit pro provedení inicializace šifrovací aplikace.",
 "Your private key is not valid! Likely your password was changed outside of %s (e.g. your corporate directory). You can update your private key password in your personal settings to recover access to your encrypted files." => "Váš soukromý klíč není platný! Pravděpodobně bylo vaše heslo změněno vně systému %s (např. ve vašem firemním adresáři). Heslo vašeho soukromého klíče můžete změnit ve svém osobním nastavení pro obnovení přístupu k vašim zašifrovaným souborům.",
 "Can not decrypt this file, probably this is a shared file. Please ask the file owner to reshare the file with you." => "Tento soubor se nepodařilo dešifrovat, pravděpodobně je sdílený. Požádejte prosím majitele souboru, aby jej s vámi znovu sdílel.",
@@ -37,8 +45,6 @@ $TRANSLATIONS = array(
 "Current log-in password" => "Aktuální přihlašovací heslo",
 "Update Private Key Password" => "Změnit heslo soukromého klíče",
 "Enable password recovery:" => "Povolit obnovu hesla:",
-"Enabling this option will allow you to reobtain access to your encrypted files in case of password loss" => "Zapnutí této volby vám umožní znovu získat přístup k vašim zašifrovaným souborům pokud ztratíte heslo",
-"File recovery settings updated" => "Možnosti záchrany souborů aktualizovány",
-"Could not update file recovery" => "Nelze nastavit záchranu souborů"
+"Enabling this option will allow you to reobtain access to your encrypted files in case of password loss" => "Zapnutí této volby vám umožní znovu získat přístup k vašim zašifrovaným souborům pokud ztratíte heslo"
 );
 $PLURAL_FORMS = "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;";

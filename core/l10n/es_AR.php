@@ -55,6 +55,8 @@ $TRANSLATIONS = array(
 "So-so password" => "Contraseña de nivel medio. ",
 "Good password" => "Buena contraseña. ",
 "Strong password" => "Contraseña fuerte.",
+"Your web server is not yet properly setup to allow files synchronization because the WebDAV interface seems to be broken." => "Tu servidor web no está configurado todavía para permitir sincronización de archivos porque la interfaz WebDAV parece no funcionar.",
+"This server has no working internet connection. This means that some of the features like mounting of external storage, notifications about updates or installation of 3rd party apps don´t work. Accessing files from remote and sending of notification emails might also not work. We suggest to enable internet connection for this server if you want to have all features." => "El servidor no posee una conexión a Internet activa. Esto significa que algunas características como el montaje de un almacenamiento externo, las notificaciones acerca de actualizaciones o la instalación de aplicaciones de terceros no funcionarán. El acceso a archivos de forma remota y el envío de correos con notificaciones es posible que tampoco funcionen. Sugerimos habilitar la conexión a Internet para este servidor si deseas tener todas estas características.",
 "Shared" => "Compartido",
 "Share" => "Compartir",
 "Error" => "Error",
@@ -118,15 +120,12 @@ $TRANSLATIONS = array(
 "Error favoriting" => "Error al favorecer",
 "Error unfavoriting" => "Error al desfavorecer",
 "Access forbidden" => "Acceso prohibido",
-"Cloud not found" => "No se encontró ownCloud",
 "Hey there,\n\njust letting you know that %s shared %s with you.\nView it: %s\n\n" => "¡Hola!\n\nsólo te quería decir que %s acaba de compartir %s contigo.\nVerlo: %s\n\n",
 "The share will expire on %s." => "El compartir expirará en %s.",
 "Cheers!" => "¡Saludos!",
 "Security Warning" => "Advertencia de seguridad",
 "Your PHP version is vulnerable to the NULL Byte attack (CVE-2006-7243)" => "La versión de PHP que tenés, es vulnerable al ataque de byte NULL (CVE-2006-7243)",
 "Please update your PHP installation to use %s securely." => "Por favor, actualizá tu instalación PHP para poder usar %s de manera segura.",
-"No secure random number generator is available, please enable the PHP OpenSSL extension." => "No hay disponible ningún generador de números aleatorios seguro. Por favor, habilitá la extensión OpenSSL de PHP.",
-"Without a secure random number generator an attacker may be able to predict password reset tokens and take over your account." => "Sin un generador de números aleatorios seguro un atacante podría predecir las pruebas de reinicio de tu contraseña y tomar control de tu cuenta.",
 "Your data directory and files are probably accessible from the internet because the .htaccess file does not work." => "Tu directorio de datos y tus archivos probablemente son accesibles a través de internet, ya que el archivo .htaccess no está funcionando.",
 "For information how to properly configure your server, please see the <a href=\"%s\" target=\"_blank\">documentation</a>." => "Para información sobre cómo configurar apropiadamente tu servidor, por favor mirá la <a href=\"%s\" target=\"_blank\">documentación</a>.",
 "Create an <strong>admin account</strong>" => "Crear una <strong>cuenta de administrador</strong>",
@@ -140,7 +139,6 @@ $TRANSLATIONS = array(
 "Database host" => "Huésped de la base de datos",
 "Finish setup" => "Completar la instalación",
 "Finishing …" => "Finalizando...",
-"This application requires JavaScript to be enabled for correct operation.  Please <a href=\"http://enable-javascript.com/\" target=\"_blank\">enable JavaScript</a> and re-load this interface." => "Esta aplicación requiere de JavaScript para su correcto funcionamiento. Por favor <a href=\"http://enable-javascript.com/\" target=\"_blank\">habilite JavaScript</a> y recargue.",
 "%s is available. Get more information on how to update." => "%s está disponible. Obtené más información sobre cómo actualizar.",
 "Log out" => "Cerrar la sesión",
 "Server side authentication failed!" => "¡Falló la autenticación del servidor!",
@@ -151,8 +149,6 @@ $TRANSLATIONS = array(
 "This ownCloud instance is currently in single user mode." => "Esta instancia de ownCloud está en modo de usuario único.",
 "This means only administrators can use the instance." => "Esto significa que solo administradores pueden usar esta instancia.",
 "Contact your system administrator if this message persists or appeared unexpectedly." => "Contacte su administrador de sistema si este mensaje persiste o aparece inesperadamente.",
-"Thank you for your patience." => "Gracias por su paciencia.",
-"This ownCloud instance is currently being updated, which may take a while." => "Esta instancia de ownClod está siendo actualizada, puede tardar un momento.",
-"Please reload this page after a short time to continue using ownCloud." => "Por favor, recargue esta página después de un tiempo para continuar usando ownCloud."
+"Thank you for your patience." => "Gracias por su paciencia."
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n != 1);";

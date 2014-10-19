@@ -66,6 +66,8 @@ $TRANSLATIONS = array(
 "So-so password" => "Halamoduzko pasahitza",
 "Good password" => "Pasahitz ona",
 "Strong password" => "Pasahitz sendoa",
+"Your web server is not yet properly setup to allow files synchronization because the WebDAV interface seems to be broken." => "Zure web zerbitzaria ez dago oraindik ongi konfiguratuta fitxategien sinkronizazioa egiteko, WebDAV interfazea ongi ez dagoela dirudi.",
+"This server has no working internet connection. This means that some of the features like mounting of external storage, notifications about updates or installation of 3rd party apps don´t work. Accessing files from remote and sending of notification emails might also not work. We suggest to enable internet connection for this server if you want to have all features." => "Zerbitzari honen interneteko konexioa ez dabil. Honek esan nahi du kanpoko biltegiratze zerbitzuak, eguneraketen informazioa edo bestelako aplikazioen instalazioa bezalako programek ez dutela funtzionatuko. Urrunetik fitxategiak eskuratzea eta e-postak bidaltzea ere ezinezkoa izan daiteke. onwCloud-en aukera guztiak erabili ahal izateko zerbitzari honetan interneteko konexioa gaitzea aholkatzen dizugu.",
 "Shared" => "Elkarbanatuta",
 "Shared with {recipients}" => "{recipients}-rekin partekatua.",
 "Share" => "Elkarbanatu",
@@ -140,15 +142,12 @@ $TRANSLATIONS = array(
 "Error favoriting" => "Errorea gogokoetara gehitzerakoan",
 "Error unfavoriting" => "Errorea gogokoetatik kentzerakoan",
 "Access forbidden" => "Sarrera debekatuta",
-"Cloud not found" => "Ez da hodeia aurkitu",
 "Hey there,\n\njust letting you know that %s shared %s with you.\nView it: %s\n\n" => "Kaixo\n\n%s-ek %s zurekin partekatu duela jakin dezazun.\nIkusi ezazu: %s\n\n",
 "The share will expire on %s." => "Elkarbanaketa %s-n iraungiko da.",
 "Cheers!" => "Ongi izan!",
 "Security Warning" => "Segurtasun abisua",
 "Your PHP version is vulnerable to the NULL Byte attack (CVE-2006-7243)" => "Zure PHP bertsioa NULL Byte erasoak (CVE-2006-7243) mendera dezake.",
 "Please update your PHP installation to use %s securely." => "Mesedez eguneratu zure PHP instalazioa %s seguru erabiltzeko",
-"No secure random number generator is available, please enable the PHP OpenSSL extension." => "Ez dago hausazko zenbaki sortzaile segururik eskuragarri, mesedez gatiu PHP OpenSSL extensioa.",
-"Without a secure random number generator an attacker may be able to predict password reset tokens and take over your account." => "Hausazko zenbaki sortzaile segururik gabe erasotzaile batek pasahitza berrezartzeko kodeak iragarri ditzake eta zure kontuaz jabetu.",
 "Your data directory and files are probably accessible from the internet because the .htaccess file does not work." => "Zure data karpeta eta fitxategiak interneten bidez eskuragarri egon daitezke .htaccess fitxategia ez delako funtzionatzen ari.",
 "For information how to properly configure your server, please see the <a href=\"%s\" target=\"_blank\">documentation</a>." => "Zure zerbitrzaria ongi konfiguratzeko, mezedez <a href=\"%s\" target=\"_blank\">dokumentazioa</a> ikusi.",
 "Create an <strong>admin account</strong>" => "Sortu <strong>kudeatzaile kontu<strong> bat",
@@ -165,7 +164,6 @@ $TRANSLATIONS = array(
 "SQLite will be used as database. For larger installations we recommend to change this." => "SQLite erabiliko da datu-base gisa. Instalazio handiagoetarako gomendatzen dugu aldatzea.",
 "Finish setup" => "Bukatu konfigurazioa",
 "Finishing …" => "Bukatzen...",
-"This application requires JavaScript to be enabled for correct operation.  Please <a href=\"http://enable-javascript.com/\" target=\"_blank\">enable JavaScript</a> and re-load this interface." => "Aplikazio honek ongi funtzionatzeko JavaScript gaitua behar du. Mesedez  <a href=\"http://enable-javascript.com/\" target=\"_blank\">gaitu JavaScript</a> eta birkargatu interfaze hau.",
 "%s is available. Get more information on how to update." => "%s erabilgarri dago. Eguneratzeaz argibide gehiago eskuratu.",
 "Log out" => "Saioa bukatu",
 "Server side authentication failed!" => "Zerbitzari aldeko autentifikazioak huts egin du!",
@@ -188,8 +186,6 @@ $TRANSLATIONS = array(
 "The theme %s has been disabled." => "%s gaia desgaitu da.",
 "Please make sure that the database, the config folder and the data folder have been backed up before proceeding." => "Ekin aurretik egiazta ezazu datu basearen, ezarpenen karpetaren eta datuen karpetaren babeskopia duzula.",
 "Start update" => "Hasi eguneraketa",
-"To avoid timeouts with larger installations, you can instead run the following command from your installation directory:" => "Instalazio handien itxarote-denbora saihesteko, ondoko komandoa exekuta dezakezu instalazio direktoriotik:",
-"This ownCloud instance is currently being updated, which may take a while." => "ownCloud instantzia hau eguneratzen ari da, honek denbora har dezake.",
-"Please reload this page after a short time to continue using ownCloud." => "Mesedez birkargatu orri hau denbora gutxi barru ownCloud erabiltzen jarraitzeko."
+"To avoid timeouts with larger installations, you can instead run the following command from your installation directory:" => "Instalazio handien itxarote-denbora saihesteko, ondoko komandoa exekuta dezakezu instalazio direktoriotik:"
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n != 1);";

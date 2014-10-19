@@ -58,6 +58,8 @@ $TRANSLATIONS = array(
 "So-so password" => "그저 그런 암호",
 "Good password" => "좋은 암호",
 "Strong password" => "강력한 암호",
+"Your web server is not yet properly setup to allow files synchronization because the WebDAV interface seems to be broken." => "WebDAV 인터페이스가 제대로 작동하지 않습니다. 웹 서버에서 파일 동기화를 사용할 수 있도록 설정이 제대로 되지 않은 것 같습니다.",
+"This server has no working internet connection. This means that some of the features like mounting of external storage, notifications about updates or installation of 3rd party apps don´t work. Accessing files from remote and sending of notification emails might also not work. We suggest to enable internet connection for this server if you want to have all features." => "서버에서 인터넷에 연결할 수 없습니다. 외부 저장소 마운트, 업데이트 알림, 제 3자 앱 설치 등 일부 기능을 사용할 수 없습니다. 외부에서 파일에 접근하거나 알림 이메일을 보내지 못할 수도 있습니다. 모든 기능을 사용하려면 인터넷에 연결하는 것을 추천합니다.",
 "Shared" => "공유됨",
 "Share" => "공유",
 "Error" => "오류",
@@ -122,15 +124,12 @@ $TRANSLATIONS = array(
 "Error favoriting" => "즐겨찾기 추가 오류",
 "Error unfavoriting" => "즐겨찾기 삭제 오류",
 "Access forbidden" => "접근 금지됨",
-"Cloud not found" => "클라우드를 찾을 수 없습니다",
 "Hey there,\n\njust letting you know that %s shared %s with you.\nView it: %s\n\n" => "안녕하세요,\n\n%s 님이 %s을(를) 공유하였음을 알려 드립니다.\n보기 링크: %s\n\n",
 "The share will expire on %s." => "이 공유는 %s 까지 유지됩니다.",
 "Cheers!" => "감사합니다!",
 "Security Warning" => "보안 경고",
 "Your PHP version is vulnerable to the NULL Byte attack (CVE-2006-7243)" => "사용 중인 PHP 버전이 NULL 바이트 공격에 취약합니다 (CVE-2006-7243)",
 "Please update your PHP installation to use %s securely." => "%s의 보안을 위하여 PHP 버전을 업데이트하십시오.",
-"No secure random number generator is available, please enable the PHP OpenSSL extension." => "안전한 난수 생성기를 사용할 수 없습니다. PHP의 OpenSSL 확장을 활성화해 주십시오.",
-"Without a secure random number generator an attacker may be able to predict password reset tokens and take over your account." => "안전한 난수 생성기를 사용하지 않으면 공격자가 암호 초기화 토큰을 추측하여 계정을 탈취할 수 있습니다.",
 "Your data directory and files are probably accessible from the internet because the .htaccess file does not work." => ".htaccess 파일이 처리되지 않아서 데이터 디렉터리와 파일을 인터넷에서 접근할 수 없을 수도 있습니다.",
 "For information how to properly configure your server, please see the <a href=\"%s\" target=\"_blank\">documentation</a>." => "올바른 서버 설정을 위한 정보는 <a href=\"%s\" target=\"_blank\">문서</a>를 참조하십시오.",
 "Create an <strong>admin account</strong>" => "<strong>관리자 계정</strong> 만들기",
@@ -146,7 +145,6 @@ $TRANSLATIONS = array(
 "Database host" => "데이터베이스 호스트",
 "Finish setup" => "설치 완료",
 "Finishing …" => "완료 중 ...",
-"This application requires JavaScript to be enabled for correct operation.  Please <a href=\"http://enable-javascript.com/\" target=\"_blank\">enable JavaScript</a> and re-load this interface." => "이 애플리케이션을 올바르게 사용하려면 자바스크립트를 활성화해야 합니다. <a href=\"http://enable-javascript.com/\" target=\"_blank\">자바스크립트를 활성화</a>한 다음 인터페이스를 새로 고치십시오.",
 "%s is available. Get more information on how to update." => "%s을(를) 사용할 수 있습니다. 업데이트하는 방법에 대해서 자세한 정보를 얻으십시오.",
 "Log out" => "로그아웃",
 "Server side authentication failed!" => "서버 인증 실패!",
@@ -159,8 +157,6 @@ $TRANSLATIONS = array(
 "This means only administrators can use the instance." => "현재 시스템 관리자만 인스턴스를 사용할 수 있습니다.",
 "Contact your system administrator if this message persists or appeared unexpectedly." => "이 메시지가 계속 표시되거나, 예상하지 못하였을 때 표시된다면 시스템 관리자에게 연락하십시오",
 "Thank you for your patience." => "기다려 주셔서 감사합니다.",
-"Start update" => "업데이트 시작",
-"This ownCloud instance is currently being updated, which may take a while." => "ownCloud 인스턴스가 현재 업데이트 중입니다. 잠시만 기다려 주십시오.",
-"Please reload this page after a short time to continue using ownCloud." => "잠시 후 페이지를 다시 불러온 다음 ownCloud를 사용해 주십시오."
+"Start update" => "업데이트 시작"
 );
 $PLURAL_FORMS = "nplurals=1; plural=0;";

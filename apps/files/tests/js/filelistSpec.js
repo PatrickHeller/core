@@ -20,7 +20,7 @@
 */
 
 describe('OCA.Files.FileList tests', function() {
-	var testFiles, alertStub, notificationStub, fileList;
+	var testFiles, alertStub, notificationStub, fileList, pageSizeStub;
 	var bcResizeStub;
 
 	/**
@@ -120,7 +120,7 @@ describe('OCA.Files.FileList tests', function() {
 			size: 250,
 			etag: '456'
 		}];
-
+		pageSizeStub = sinon.stub(OCA.Files.FileList.prototype, 'pageSize').returns(20);
 		fileList = new OCA.Files.FileList($('#app-content-files'));
 	});
 	afterEach(function() {
@@ -130,6 +130,7 @@ describe('OCA.Files.FileList tests', function() {
 		notificationStub.restore();
 		alertStub.restore();
 		bcResizeStub.restore();
+		pageSizeStub.restore();
 	});
 	describe('Getters', function() {
 		it('Returns the current directory', function() {
@@ -421,15 +422,15 @@ describe('OCA.Files.FileList tests', function() {
 			fileList.setFiles(testFiles);
 			doDelete();
 
-			expect(fileList.findFileEl('One.txt').find('.progress-icon:not(.delete-icon)').length).toEqual(1);
-			expect(fileList.findFileEl('Three.pdf').find('.delete-icon:not(.progress-icon)').length).toEqual(1);
+			expect(fileList.findFileEl('One.txt').find('.icon-loading-small:not(.icon-delete)').length).toEqual(1);
+			expect(fileList.findFileEl('Three.pdf').find('.icon-delete:not(.icon-loading-small)').length).toEqual(1);
 		});
 		it('shows spinner on all files when deleting all', function() {
 			fileList.setFiles(testFiles);
 
 			fileList.do_delete();
 
-			expect(fileList.$fileList.find('tr .progress-icon:not(.delete-icon)').length).toEqual(4);
+			expect(fileList.$fileList.find('tr .icon-loading-small:not(.icon-delete)').length).toEqual(4);
 		});
 		it('updates summary when deleting last file', function() {
 			var $summary;
@@ -814,7 +815,7 @@ describe('OCA.Files.FileList tests', function() {
 			fileList.$fileList.on('fileActionsReady', handler);
 			fileList._nextPage();
 			expect(handler.calledOnce).toEqual(true);
-			expect(handler.getCall(0).args[0].$files.length).toEqual(fileList.pageSize);
+			expect(handler.getCall(0).args[0].$files.length).toEqual(fileList.pageSize());
 		});
 		it('does not trigger "fileActionsReady" event after single add with silent argument', function() {
 			var handler = sinon.stub();
@@ -1835,7 +1836,6 @@ describe('OCA.Files.FileList tests', function() {
 			// but it makes it possible to simulate the event triggering to
 			// test the response of the handlers
 			$uploader = $('#file_upload_start');
-			fileList.setupUploadEvents();
 			fileList.setFiles(testFiles);
 		});
 
@@ -1912,6 +1912,16 @@ describe('OCA.Files.FileList tests', function() {
 				ev = dropOn(fileList.$fileList.find('th:first'));
 
 				expect(ev.result).toEqual(false);
+				expect(notificationStub.calledOnce).toEqual(true);
+			});
+			it('drop on an folder does not trigger upload if no upload permission on that folder', function() {
+				var $tr = fileList.findFileEl('somedir');
+				var ev;
+				$tr.data('permissions', OC.PERMISSION_READ);
+				ev = dropOn($tr);
+
+				expect(ev.result).toEqual(false);
+				expect(notificationStub.calledOnce).toEqual(true);
 			});
 			it('drop on a file row inside the table triggers upload to current folder', function() {
 				var ev;

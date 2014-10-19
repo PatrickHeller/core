@@ -37,9 +37,33 @@ class Test_Util extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $result);
 	}
 
+	function testFormatDateWithTZ() {
+		date_default_timezone_set("UTC");
+
+		$result = OC_Util::formatDate(1350129205, false, 'Europe/Berlin');
+		$expected = 'October 13, 2012 13:53';
+		$this->assertEquals($expected, $result);
+	}
+
+	/**
+	 * @expectedException Exception
+	 */
+	function testFormatDateWithInvalidTZ() {
+		OC_Util::formatDate(1350129205, false, 'Mordor/Barad-dûr');
+	}
+
+	function testFormatDateWithTZFromSession() {
+		date_default_timezone_set("UTC");
+
+		\OC::$server->getSession()->set('timezone', 3);
+		$result = OC_Util::formatDate(1350129205, false);
+		$expected = 'October 13, 2012 14:53';
+		$this->assertEquals($expected, $result);
+	}
+
 	function testCallRegister() {
 		$result = strlen(OC_Util::callRegister());
-		$this->assertEquals(20, $result);
+		$this->assertEquals(30, $result);
 	}
 
 	function testSanitizeHTML() {
@@ -116,7 +140,10 @@ class Test_Util extends PHPUnit_Framework_TestCase {
 
 	function testGetInstanceIdGeneratesValidId() {
 		OC_Config::deleteKey('instanceid');
-		$this->assertStringStartsWith('oc', OC_Util::getInstanceId());
+		$instanceId = OC_Util::getInstanceId();
+		$this->assertStringStartsWith('oc', $instanceId);
+		$matchesRegex = preg_match('/^[a-z0-9]+$/', $instanceId);
+		$this->assertSame(1, $matchesRegex);
 	}
 
 	/**
@@ -303,6 +330,8 @@ class Test_Util extends PHPUnit_Framework_TestCase {
 		\OC::$WEBROOT = '';
 
 		Dummy_OC_App::setEnabledApps($enabledApps);
+		// need to set a user id to make sure enabled apps are read from cache
+		\OC_User::setUserId(uniqid());
 		\OCP\Config::setSystemValue('defaultapp', $defaultAppConfig);
 		$this->assertEquals('http://localhost/' . $expectedPath, \OC_Util::getDefaultPageUrl());
 
@@ -310,6 +339,7 @@ class Test_Util extends PHPUnit_Framework_TestCase {
 		\OC::$WEBROOT = $oldWebRoot;
 		Dummy_OC_App::restore();
 		\OCP\Config::setSystemValue('defaultapp', $oldDefaultApps);
+		\OC_User::setUserId(null);
 	}
 
 	function defaultAppsProvider() {
@@ -341,6 +371,25 @@ class Test_Util extends PHPUnit_Framework_TestCase {
 		);
 	}
 
+	/**
+	 * Test needUpgrade() when the core version is increased
+	 */
+	public function testNeedUpgradeCore() {
+		$oldConfigVersion = OC_Config::getValue('version', '0.0.0');
+		$oldSessionVersion = \OC::$server->getSession()->get('OC_Version');
+
+		$this->assertFalse(\OCP\Util::needUpgrade());
+
+		OC_Config::setValue('version', '7.0.0.0');
+		\OC::$server->getSession()->set('OC_Version', array(7, 0, 0, 1));
+
+		$this->assertTrue(\OCP\Util::needUpgrade());
+
+		OC_Config::setValue('version', $oldConfigVersion);
+		$oldSessionVersion = \OC::$server->getSession()->set('OC_Version', $oldSessionVersion);
+
+		$this->assertFalse(\OCP\Util::needUpgrade());
+	}
 }
 
 /**

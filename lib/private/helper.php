@@ -129,12 +129,12 @@ class OC_Helper {
 	 * Returns a absolute url to the given service.
 	 */
 	public static function linkToPublic($service, $add_slash = false) {
-		return OC::$server->getURLGenerator()->getAbsoluteURL(
-			self::linkTo(
-				'', 'public.php') . '?service=' . $service
-				. (($add_slash && $service[strlen($service) - 1] != '/') ? '/' : ''
-			)
-		);
+		if ($service === 'files') {
+			$url = OC::$server->getURLGenerator()->getAbsoluteURL('/s');
+		} else {
+			$url = OC::$server->getURLGenerator()->getAbsoluteURL(self::linkTo('', 'public.php').'?service='.$service);
+		}
+		return $url . (($add_slash && $service[strlen($service) - 1] != '/') ? '/' : '');
 	}
 
 	/**
@@ -417,9 +417,10 @@ class OC_Helper {
 	/**
 	 * Recursive deletion of folders
 	 * @param string $dir path to the folder
+	 * @param bool $deleteSelf if set to false only the content of the folder will be deleted
 	 * @return bool
 	 */
-	static function rmdirr($dir) {
+	static function rmdirr($dir, $deleteSelf = true) {
 		if (is_dir($dir)) {
 			$files = new RecursiveIteratorIterator(
 				new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
@@ -434,15 +435,19 @@ class OC_Helper {
 					unlink($fileInfo->getRealPath());
 				}
 			}
-			rmdir($dir);
+			if ($deleteSelf) {
+				rmdir($dir);
+			}
 		} elseif (file_exists($dir)) {
-			unlink($dir);
+			if ($deleteSelf) {
+				unlink($dir);
+			}
 		}
-		if (file_exists($dir)) {
-			return false;
-		} else {
+		if (!$deleteSelf) {
 			return true;
 		}
+
+		return !file_exists($dir);
 	}
 
 	/**
@@ -645,10 +650,10 @@ class OC_Helper {
 	 * temporary files are automatically cleaned up after the script is finished
 	 */
 	public static function tmpFolder() {
-		$path = get_temp_dir() . '/' . md5(time() . rand());
+		$path = get_temp_dir() . DIRECTORY_SEPARATOR . md5(time() . rand());
 		mkdir($path);
 		self::$tmpFiles[] = $path;
-		return $path . '/';
+		return $path . DIRECTORY_SEPARATOR;
 	}
 
 	/**
@@ -659,15 +664,33 @@ class OC_Helper {
 		if (file_exists($leftoversFile)) {
 			$leftovers = file($leftoversFile);
 			foreach ($leftovers as $file) {
-				self::rmdirr($file);
+				try {
+					self::rmdirr($file);
+				} catch (UnexpectedValueException $ex) {
+					// not really much we can do here anymore
+					if (!is_null(\OC::$server)) {
+						$message = $ex->getMessage();
+						\OC::$server->getLogger()->error("Error deleting file/folder: $file - Reason: $message",
+							array('app' => 'core'));
+					}
+				}
 			}
 			unlink($leftoversFile);
 		}
 
 		foreach (self::$tmpFiles as $file) {
 			if (file_exists($file)) {
-				if (!self::rmdirr($file)) {
-					file_put_contents($leftoversFile, $file . "\n", FILE_APPEND);
+				try {
+					if (!self::rmdirr($file)) {
+						file_put_contents($leftoversFile, $file . "\n", FILE_APPEND);
+					}
+				} catch (UnexpectedValueException $ex) {
+					// not really much we can do here anymore
+					if (!is_null(\OC::$server)) {
+						$message = $ex->getMessage();
+						\OC::$server->getLogger()->error("Error deleting file/folder: $file - Reason: $message",
+							array('app' => 'core'));
+					}
 				}
 			}
 		}

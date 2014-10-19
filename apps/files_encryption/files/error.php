@@ -4,7 +4,10 @@ if (!isset($_)) { //also provide standalone error page
 	require_once __DIR__ . '/../../../lib/base.php';
 	require_once __DIR__ . '/../lib/crypt.php';
 
-	$l = OC_L10N::get('files_encryption');
+	OC_JSON::checkAppEnabled('files_encryption');
+	OC_App::loadApp('files_encryption');
+
+	$l = \OC::$server->getL10N('files_encryption');
 
 	if (isset($_GET['errorCode'])) {
 		$errorCode = $_GET['errorCode'];

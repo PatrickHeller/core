@@ -118,6 +118,22 @@ class OC_Mount_Config {
 			}
 			$manager->addMount($mount);
 		}
+
+		if ($data['user']) {
+			$user = \OC::$server->getUserManager()->get($data['user']);
+			$userView = new \OC\Files\View('/' . $user->getUID() . '/files');
+			$changePropagator = new \OC\Files\Cache\ChangePropagator($userView);
+			$etagPropagator = new \OCA\Files_External\EtagPropagator($user, $changePropagator, \OC::$server->getConfig());
+			$etagPropagator->propagateDirtyMountPoints();
+			\OCP\Util::connectHook(
+				\OC\Files\Filesystem::CLASSNAME,
+				\OC\Files\Filesystem::signal_create_mount,
+				$etagPropagator, 'updateHook');
+			\OCP\Util::connectHook(
+				\OC\Files\Filesystem::CLASSNAME,
+				\OC\Files\Filesystem::signal_delete_mount,
+				$etagPropagator, 'updateHook');
+		}
 	}
 
 	/**
@@ -463,6 +479,7 @@ class OC_Mount_Config {
 										 $priority = null) {
 		$backends = self::getBackends();
 		$mountPoint = OC\Files\Filesystem::normalizePath($mountPoint);
+		$relMountPoint = $mountPoint;
 		if ($mountPoint === '' || $mountPoint === '/') {
 			// can't mount at root folder
 			return false;
@@ -495,6 +512,10 @@ class OC_Mount_Config {
 		}
 
 		$mountPoints = self::readData($isPersonal ? OCP\User::getUser() : NULL);
+		// who else loves multi-dimensional array ?
+		$isNew = !isset($mountPoints[$mountType]) ||
+			!isset($mountPoints[$mountType][$applicable]) ||
+			!isset($mountPoints[$mountType][$applicable][$mountPoint]);
 		$mountPoints = self::mergeMountPoints($mountPoints, $mount, $mountType);
 
 		// Set default priority if none set
@@ -510,7 +531,19 @@ class OC_Mount_Config {
 
 		self::writeData($isPersonal ? OCP\User::getUser() : NULL, $mountPoints);
 
-		return self::getBackendStatus($class, $classOptions, $isPersonal);
+		$result = self::getBackendStatus($class, $classOptions, $isPersonal);
+		if ($result && $isNew) {
+			\OC_Hook::emit(
+				\OC\Files\Filesystem::CLASSNAME,
+				\OC\Files\Filesystem::signal_create_mount,
+				array(
+					\OC\Files\Filesystem::signal_param_path => $relMountPoint,
+					\OC\Files\Filesystem::signal_param_mount_type => $mountType,
+					\OC\Files\Filesystem::signal_param_users => $applicable,
+				)
+			);
+		}
+		return $result;
 	}
 
 	/**
@@ -523,6 +556,7 @@ class OC_Mount_Config {
 	*/
 	public static function removeMountPoint($mountPoint, $mountType, $applicable, $isPersonal = false) {
 		// Verify that the mount point applies for the current user
+		$relMountPoints = $mountPoint;
 		if ($isPersonal) {
 			if ($applicable != OCP\User::getUser()) {
 				return false;
@@ -543,6 +577,15 @@ class OC_Mount_Config {
 			}
 		}
 		self::writeData($isPersonal ? OCP\User::getUser() : NULL, $mountPoints);
+		\OC_Hook::emit(
+			\OC\Files\Filesystem::CLASSNAME,
+			\OC\Files\Filesystem::signal_delete_mount,
+			array(
+				\OC\Files\Filesystem::signal_param_path => $relMountPoints,
+				\OC\Files\Filesystem::signal_param_mount_type => $mountType,
+				\OC\Files\Filesystem::signal_param_users => $applicable,
+			)
+		);
 		return true;
 	}
 
@@ -617,53 +660,6 @@ class OC_Mount_Config {
 		$content = json_encode($data, $options);
 		@file_put_contents($file, $content);
 		@chmod($file, 0640);
-	}
-
-	/**
-	 * Returns all user uploaded ssl root certificates
-	 * @return array
-	 */
-	public static function getCertificates() {
-		$path=OC_User::getHome(OC_User::getUser()) . '/files_external/uploads/';
-		\OCP\Util::writeLog('files_external', 'checking path '.$path, \OCP\Util::INFO);
-		if ( ! is_dir($path)) {
-			//path might not exist (e.g. non-standard OC_User::getHome() value)
-			//in this case create full path using 3rd (recursive=true) parameter.
-			mkdir($path, 0777, true);
-		}
-		$result = array();
-		$handle = opendir($path);
-		if(!is_resource($handle)) {
-			return array();
-		}
-		while (false !== ($file = readdir($handle))) {
-			if ($file != '.' && $file != '..') $result[] = $file;
-		}
-		return $result;
-	}
-
-	/**
-	 * creates certificate bundle
-	 */
-	public static function createCertificateBundle() {
-		$path=OC_User::getHome(OC_User::getUser()) . '/files_external';
-
-		$certs = OC_Mount_Config::getCertificates();
-		$fh_certs = fopen($path."/rootcerts.crt", 'w');
-		foreach ($certs as $cert) {
-			$file=$path.'/uploads/'.$cert;
-			$fh = fopen($file, "r");
-			$data = fread($fh, filesize($file));
-			fclose($fh);
-			if (strpos($data, 'BEGIN CERTIFICATE')) {
-				fwrite($fh_certs, $data);
-				fwrite($fh_certs, "\r\n");
-			}
-		}
-
-		fclose($fh_certs);
-
-		return true;
 	}
 
 	/**

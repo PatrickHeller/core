@@ -20,9 +20,6 @@ $application->registerRoutes($this, array('routes' => array(
 // Post installation check
 
 /** @var $this OCP\Route\IRouter */
-$this->create('post_setup_check', '/post-setup-check')
-	->action('OC_Setup', 'postSetupCheck');
-
 // Core ajax actions
 // Search
 $this->create('search_ajax_search', '/search/ajax/search.php')
@@ -99,6 +96,11 @@ $this->create('core_avatar_delete', '/avatar/')
 $this->create('core_avatar_post_cropped', '/avatar/cropped')
 	->post()
 	->action('OC\Core\Avatar\Controller', 'postCroppedAvatar');
+
+// Sharing routes
+$this->create('core_share_show_share', '/s/{token}')
+	->get()
+	->action('OC\Core\Share\Controller', 'showShare');
 
 // used for heartbeat
 $this->create('heartbeat', '/heartbeat')->action(function(){

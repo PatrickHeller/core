@@ -35,11 +35,24 @@ class URLGenerator implements IURLGenerator {
 	 * @internal param array $args with param=>value, will be appended to the returned url
 	 * @return string the url
 	 *
-	 * Returns a url to the given app and file.
+	 * Returns a url to the given route.
 	 */
 	public function linkToRoute($route, $parameters = array()) {
 		$urlLinkTo = \OC::$server->getRouter()->generate($route, $parameters);
 		return $urlLinkTo;
+	}
+
+	/**
+	 * Creates an absolute url using a defined route
+	 * @param string $route
+	 * @param array $parameters
+	 * @internal param array $args with param=>value, will be appended to the returned url
+	 * @return string the url
+	 *
+	 * Returns an absolute url to the given route.
+	 */
+	public function linkToRouteAbsolute($routeName, $arguments = array()) {
+		return $this->getAbsoluteURL($this->linkToRoute($routeName, $arguments));
 	}
 
 	/**
@@ -148,6 +161,10 @@ class URLGenerator implements IURLGenerator {
 	 */
 	public function getAbsoluteURL($url) {
 		$separator = $url[0] === '/' ? '' : '/';
+
+		if (\OC::$CLI && !defined('PHPUNIT_RUN')) {
+			return rtrim($this->config->getSystemValue('overwrite.cli.url'), '/') . '/' . ltrim($url, '/');
+		}
 
 		// The ownCloud web root can already be prepended.
 		$webRoot = substr($url, 0, strlen(\OC::$WEBROOT)) === \OC::$WEBROOT

@@ -193,7 +193,7 @@ class OC {
 	}
 
 	public static function checkConfig() {
-		$l = OC_L10N::get('lib');
+		$l = \OC::$server->getL10N('lib');
 		if (file_exists(self::$configDir . "/config.php")
 			and !is_writable(self::$configDir . "/config.php")
 		) {
@@ -255,6 +255,7 @@ class OC {
 
 			// render error page
 			$tmpl = new OC_Template('', 'update.user', 'guest');
+			OC_Util::addscript('maintenance-check');
 			$tmpl->printPage();
 			die();
 		}
@@ -495,6 +496,9 @@ class OC {
 			require_once $vendorAutoLoad;
 		}
 
+		// initialize intl fallback is necessary
+		\Patchwork\Utf8\Bootup::initIntl();
+
 		if (!defined('PHPUNIT_RUN')) {
 			OC\Log\ErrorHandler::setLogger(OC_Log::$object);
 			if (defined('DEBUG') and DEBUG) {
@@ -527,7 +531,7 @@ class OC {
 		self::checkSSL();
 		OC_Response::addSecurityHeaders();
 
-		$errors = OC_Util::checkServer();
+		$errors = OC_Util::checkServer(\OC::$server->getConfig());
 		if (count($errors) > 0) {
 			if (self::$CLI) {
 				foreach ($errors as $error) {
@@ -554,7 +558,9 @@ class OC {
 		OC_Group::useBackend(new OC_Group_Database());
 
 		//setup extra user backends
-		OC_User::setupBackends();
+		if (!self::checkUpgrade(false)) {
+			OC_User::setupBackends();
+		}
 
 		self::registerCacheHooks();
 		self::registerFilesystemHooks();
@@ -574,7 +580,7 @@ class OC {
 
 		// Check whether the sample configuration has been copied
 		if(OC_Config::getValue('copied_sample_config', false)) {
-			$l = \OC_L10N::get('lib');
+			$l = \OC::$server->getL10N('lib');
 			header('HTTP/1.1 503 Service Temporarily Unavailable');
 			header('Status: 503 Service Temporarily Unavailable');
 			OC_Template::printErrorPage(
@@ -582,6 +588,29 @@ class OC {
 				$l->t('It has been detected that the sample configuration has been copied. This can break your installation and is unsupported. Please read the documentation before performing changes on config.php')
 			);
 			return;
+		}
+
+		$host = OC_Request::insecureServerHost();
+		// if the host passed in headers isn't trusted
+		if (!OC::$CLI
+			// overwritehost is always trusted
+			&& OC_Request::getOverwriteHost() === null
+			&& !OC_Request::isTrustedDomain($host)
+		) {
+			header('HTTP/1.1 400 Bad Request');
+			header('Status: 400 Bad Request');
+
+			$domain = $_SERVER['SERVER_NAME'];
+			// Append port to domain in case it is not
+			if($_SERVER['SERVER_PORT'] !== '80' && $_SERVER['SERVER_PORT'] !== '443') {
+				$domain .= ':'.$_SERVER['SERVER_PORT'];
+			}
+
+			$tmpl = new OCP\Template('core', 'untrustedDomain', 'guest');
+			$tmpl->assign('domain', $domain);
+			$tmpl->printPage();
+
+			exit();
 		}
 	}
 
@@ -672,7 +701,6 @@ class OC {
 	 * Handle the request
 	 */
 	public static function handleRequest() {
-		$l = \OC_L10N::get('lib');
 		// load all the classpaths from the enabled apps so they are available
 		// in the routing files of each app
 		OC::loadAppClassPaths();
@@ -684,35 +712,11 @@ class OC {
 			exit();
 		}
 
-		$host = OC_Request::insecureServerHost();
-		// if the host passed in headers isn't trusted
-		if (!OC::$CLI
-			// overwritehost is always trusted
-			&& OC_Request::getOverwriteHost() === null
-			&& !OC_Request::isTrustedDomain($host)
-		) {
-			header('HTTP/1.1 400 Bad Request');
-			header('Status: 400 Bad Request');
-			$tmpl = new OCP\Template('core', 'untrustedDomain', 'guest');
-			$tmpl->assign('domain', $_SERVER['SERVER_NAME']);
-			$tmpl->printPage();
-			return;
-		}
-
 		$request = OC_Request::getPathInfo();
 		if (substr($request, -3) !== '.js') { // we need these files during the upgrade
 			self::checkMaintenanceMode();
 			self::checkUpgrade();
 		}
-
-		if (!OC_User::isLoggedIn()) {
-			// Test it the user is already authenticated using Apaches AuthType Basic... very usable in combination with LDAP
-			if (!OC_Config::getValue('maintenance', false) && !self::checkUpgrade(false)) {
-				OC_App::loadApps(array('authentication'));
-			}
-			OC::tryBasicAuthLogin();
-		}
-
 
 		if (!self::$CLI and (!isset($_GET["logout"]) or ($_GET["logout"] !== 'true'))) {
 			try {
@@ -722,6 +726,7 @@ class OC {
 					OC_App::loadApps();
 				}
 				self::checkSingleUserMode();
+				OC_Util::setupFS();
 				OC::$server->getRouter()->match(OC_Request::getRawPathInfo());
 				return;
 			} catch (Symfony\Component\Routing\Exception\ResourceNotFoundException $e) {
@@ -777,19 +782,11 @@ class OC {
 		if (OC_User::isLoggedIn()) {
 			OC_App::loadApps();
 			OC_User::setupBackends();
+			OC_Util::setupFS();
 			if (isset($_GET["logout"]) and ($_GET["logout"])) {
 				OC_JSON::callCheck();
 				if (isset($_COOKIE['oc_token'])) {
 					OC_Preferences::deleteKey(OC_User::getUser(), 'login_token', $_COOKIE['oc_token']);
-				}
-				if (isset($_SERVER['PHP_AUTH_USER'])) {
-					if (isset($_COOKIE['oc_ignore_php_auth_user'])) {
-						// Ignore HTTP Authentication for 5 more mintues.
-						setcookie('oc_ignore_php_auth_user', $_SERVER['PHP_AUTH_USER'], time() + 300, OC::$WEBROOT.(empty(OC::$WEBROOT) ? '/' : ''));
-					} elseif ($_SERVER['PHP_AUTH_USER'] === self::$server->getSession()->get('loginname')) {
-						// Ignore HTTP Authentication to allow a different user to log in.
-						setcookie('oc_ignore_php_auth_user', $_SERVER['PHP_AUTH_USER'], 0, OC::$WEBROOT.(empty(OC::$WEBROOT) ? '/' : ''));
-					}
 				}
 				OC_User::logout();
 				// redirect to webroot and add slash if webroot is empty
@@ -916,7 +913,7 @@ class OC {
 	}
 
 	/**
-	 * Tries to login a user using the formbased authentication
+	 * Tries to login a user using the form based authentication
 	 * @return bool|void
 	 */
 	protected static function tryFormLogin() {
@@ -924,27 +921,31 @@ class OC {
 			return false;
 		}
 
-		OC_JSON::callCheck();
+		if(!OC_Util::isCallRegistered()) {
+			return false;
+		}
 		OC_App::loadApps();
 
 		//setup extra user backends
 		OC_User::setupBackends();
 
 		if (OC_User::login($_POST["user"], $_POST["password"])) {
+			$userId = OC_User::getUser();
+
 			// setting up the time zone
 			if (isset($_POST['timezone-offset'])) {
 				self::$server->getSession()->set('timezone', $_POST['timezone-offset']);
+				self::$server->getConfig()->setUserValue($userId, 'core', 'timezone', $_POST['timezone']);
 			}
 
-			$userid = OC_User::getUser();
-			self::cleanupLoginTokens($userid);
+			self::cleanupLoginTokens($userId);
 			if (!empty($_POST["remember_login"])) {
 				if (defined("DEBUG") && DEBUG) {
-					OC_Log::write('core', 'Setting remember login to cookie', OC_Log::DEBUG);
+					self::$server->getLogger()->debug('Setting remember login to cookie', array('app' => 'core'));
 				}
-				$token = OC_Util::generateRandomBytes(32);
-				OC_Preferences::setValue($userid, 'login_token', $token, time());
-				OC_User::setMagicInCookie($userid, $token);
+				$token = \OC::$server->getSecureRandom()->getMediumStrengthGenerator()->generate(32);
+				self::$server->getConfig()->setUserValue($userId, 'login_token', $token, time());
+				OC_User::setMagicInCookie($userId, $token);
 			} else {
 				OC_User::unsetMagicInCookie();
 			}
@@ -953,27 +954,6 @@ class OC {
 		}
 		return true;
 	}
-
-	/**
-	 * Try to login a user using HTTP authentication.
-	 * @return bool
-	 */
-	protected static function tryBasicAuthLogin() {
-		if (!isset($_SERVER["PHP_AUTH_USER"])
-			|| !isset($_SERVER["PHP_AUTH_PW"])
-			|| (isset($_COOKIE['oc_ignore_php_auth_user']) && $_COOKIE['oc_ignore_php_auth_user'] === $_SERVER['PHP_AUTH_USER'])
-		) {
-			return false;
-		}
-
-		if (OC_User::login($_SERVER["PHP_AUTH_USER"], $_SERVER["PHP_AUTH_PW"])) {
-			//OC_Log::write('core',"Logged in with HTTP Authentication", OC_Log::DEBUG);
-			OC_User::unsetMagicInCookie();
-			$_SERVER['HTTP_REQUESTTOKEN'] = OC_Util::callRegister();
-		}
-		return true;
-	}
-
 }
 
 if (!function_exists('get_temp_dir')) {

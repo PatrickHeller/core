@@ -381,32 +381,43 @@ class OC_Util {
 	 *
 	 * @param int $timestamp
 	 * @param bool $dateOnly option to omit time from the result
+	 * @param DateTimeZone|string $timeZone where the given timestamp shall be converted to
 	 * @return string timestamp
 	 * @description adjust to clients timezone if we know it
 	 */
-	public static function formatDate( $timestamp, $dateOnly = false) {
-		if(\OC::$server->getSession()->exists('timezone')) {
-			$systemTimeZone = intval(date('O'));
-			$systemTimeZone = (round($systemTimeZone / 100, 0) * 60) + ($systemTimeZone % 100);
-			$clientTimeZone = \OC::$server->getSession()->get('timezone') * 60;
-			$offset = $clientTimeZone - $systemTimeZone;
-			$timestamp = $timestamp + $offset * 60;
+	public static function formatDate($timestamp, $dateOnly = false, $timeZone = null) {
+		if (is_null($timeZone)) {
+			if (\OC::$server->getSession()->exists('timezone')) {
+				$systemTimeZone = intval(date('O'));
+				$systemTimeZone = (round($systemTimeZone / 100, 0) * 60) + ($systemTimeZone % 100);
+				$clientTimeZone = \OC::$server->getSession()->get('timezone') * 60;
+				$offset = $clientTimeZone - $systemTimeZone;
+				$timestamp = $timestamp + $offset * 60;
+			}
+		} else {
+			if (!$timeZone instanceof DateTimeZone) {
+				$timeZone = new DateTimeZone($timeZone);
+			}
+			$dt = new DateTime("@$timestamp");
+			$offset = $timeZone->getOffset($dt);
+			$timestamp += $offset;
 		}
-		$l = OC_L10N::get('lib');
+		$l = \OC::$server->getL10N('lib');
 		return $l->l($dateOnly ? 'date' : 'datetime', $timestamp);
 	}
 
 	/**
 	 * check if the current server configuration is suitable for ownCloud
 	 *
+	 * @param \OCP\IConfig $config
 	 * @return array arrays with error messages and hints
 	 */
-	public static function checkServer() {
-		$l = OC_L10N::get('lib');
+	public static function checkServer($config) {
+		$l = \OC::$server->getL10N('lib');
 		$errors = array();
-		$CONFIG_DATADIRECTORY = OC_Config::getValue('datadirectory', OC::$SERVERROOT . '/data');
+		$CONFIG_DATADIRECTORY = $config->getSystemValue('datadirectory', OC::$SERVERROOT . '/data');
 
-		if (!self::needUpgrade() && OC_Config::getValue('installed', false)) {
+		if (!self::needUpgrade($config) && $config->getSystemValue('installed', false)) {
 			// this check needs to be done every time
 			$errors = self::checkDataDirectoryValidity($CONFIG_DATADIRECTORY);
 		}
@@ -446,7 +457,7 @@ class OC_Util {
 		}
 
 		// Check if there is a writable install folder.
-		if (OC_Config::getValue('appstoreenabled', true)) {
+		if ($config->getSystemValue('appstoreenabled', true)) {
 			if (OC_App::getInstallPath() === null
 				|| !is_writable(OC_App::getInstallPath())
 				|| !is_readable(OC_App::getInstallPath())
@@ -461,25 +472,27 @@ class OC_Util {
 			}
 		}
 		// Create root dir.
-		if (!is_dir($CONFIG_DATADIRECTORY)) {
-			$success = @mkdir($CONFIG_DATADIRECTORY);
-			if ($success) {
-				$errors = array_merge($errors, self::checkDataDirectoryPermissions($CONFIG_DATADIRECTORY));
-			} else {
+		if ($config->getSystemValue('installed', false)) {
+			if (!is_dir($CONFIG_DATADIRECTORY)) {
+				$success = @mkdir($CONFIG_DATADIRECTORY);
+				if ($success) {
+					$errors = array_merge($errors, self::checkDataDirectoryPermissions($CONFIG_DATADIRECTORY));
+				} else {
+					$errors[] = array(
+						'error' => $l->t('Cannot create "data" directory (%s)', array($CONFIG_DATADIRECTORY)),
+						'hint' => $l->t('This can usually be fixed by '
+							. '<a href="%s" target="_blank">giving the webserver write access to the root directory</a>.',
+							array(OC_Helper::linkToDocs('admin-dir_permissions')))
+					);
+				}
+			} else if (!is_writable($CONFIG_DATADIRECTORY) or !is_readable($CONFIG_DATADIRECTORY)) {
 				$errors[] = array(
-					'error' => $l->t('Cannot create "data" directory (%s)', array($CONFIG_DATADIRECTORY)),
-					'hint' => $l->t('This can usually be fixed by '
-						. '<a href="%s" target="_blank">giving the webserver write access to the root directory</a>.',
-						array(OC_Helper::linkToDocs('admin-dir_permissions')))
+					'error' => 'Data directory (' . $CONFIG_DATADIRECTORY . ') not writable by ownCloud',
+					'hint' => $permissionsHint
 				);
+			} else {
+				$errors = array_merge($errors, self::checkDataDirectoryPermissions($CONFIG_DATADIRECTORY));
 			}
-		} else if (!is_writable($CONFIG_DATADIRECTORY) or !is_readable($CONFIG_DATADIRECTORY)) {
-			$errors[] = array(
-				'error' => 'Data directory (' . $CONFIG_DATADIRECTORY . ') not writable by ownCloud',
-				'hint' => $permissionsHint
-			);
-		} else {
-			$errors = array_merge($errors, self::checkDataDirectoryPermissions($CONFIG_DATADIRECTORY));
 		}
 
 		if (!OC_Util::isSetLocaleWorking()) {
@@ -491,90 +504,62 @@ class OC_Util {
 			);
 		}
 
+		// Contains the dependencies that should be checked against
+		// classes = class_exists
+		// functions = function_exists
+		// defined = defined
+		// If the dependency is not found the missing module name is shown to the EndUser
+		$dependencies = array(
+			'classes' => array(
+				'ZipArchive' => 'zip',
+				'DOMDocument' => 'dom',
+			),
+			'functions' => array(
+				'xml_parser_create' => 'libxml',
+				'mb_detect_encoding' => 'mb multibyte',
+				'ctype_digit' => 'ctype',
+				'json_encode' => 'JSON',
+				'gd_info' => 'GD',
+				'gzencode' => 'zlib',
+				'iconv' => 'iconv',
+				'simplexml_load_string' => 'SimpleXML'
+			),
+			'defined' => array(
+				'PDO::ATTR_DRIVER_NAME' => 'PDO'
+			)
+		);
+		$missingDependencies = array();
 		$moduleHint = $l->t('Please ask your server administrator to install the module.');
-		// check if all required php modules are present
-		if (!class_exists('ZipArchive')) {
+
+		foreach ($dependencies['classes'] as $class => $module) {
+			if (!class_exists($class)) {
+				$missingDependencies[] = $module;
+			}
+		}
+		foreach ($dependencies['functions'] as $function => $module) {
+			if (!function_exists($function)) {
+				$missingDependencies[] = $module;
+			}
+		}
+		foreach ($dependencies['defined'] as $defined => $module) {
+			if (!defined($defined)) {
+				$missingDependencies[] = $module;
+			}
+		}
+
+		foreach($missingDependencies as $missingDependency) {
 			$errors[] = array(
-				'error' => $l->t('PHP module %s not installed.', array('zip')),
+				'error' => $l->t('PHP module %s not installed.', array($missingDependency)),
 				'hint' => $moduleHint
 			);
 			$webServerRestart = true;
 		}
-		if (!class_exists('DOMDocument')) {
-			$errors[] = array(
-				'error' => $l->t('PHP module %s not installed.', array('dom')),
-				'hint' => $moduleHint
-			);
-			$webServerRestart = true;
-		}
-		if (!function_exists('xml_parser_create')) {
-			$errors[] = array(
-				'error' => $l->t('PHP module %s not installed.', array('libxml')),
-				'hint' => $moduleHint
-			);
-			$webServerRestart = true;
-		}
-		if (!function_exists('mb_detect_encoding')) {
-			$errors[] = array(
-				'error' => 'PHP module mb multibyte not installed.',
-				'hint' => $moduleHint
-			);
-			$webServerRestart = true;
-		}
-		if (!function_exists('ctype_digit')) {
-			$errors[] = array(
-				'error' => $l->t('PHP module %s not installed.', array('ctype')),
-				'hint' => $moduleHint
-			);
-			$webServerRestart = true;
-		}
-		if (!function_exists('json_encode')) {
-			$errors[] = array(
-				'error' => $l->t('PHP module %s not installed.', array('JSON')),
-				'hint' => $moduleHint
-			);
-			$webServerRestart = true;
-		}
-		if (!extension_loaded('gd') || !function_exists('gd_info')) {
-			$errors[] = array(
-				'error' => $l->t('PHP module %s not installed.', array('GD')),
-				'hint' => $moduleHint
-			);
-			$webServerRestart = true;
-		}
-		if (!function_exists('gzencode')) {
-			$errors[] = array(
-				'error' => $l->t('PHP module %s not installed.', array('zlib')),
-				'hint' => $moduleHint
-			);
-			$webServerRestart = true;
-		}
-		if (!function_exists('iconv')) {
-			$errors[] = array(
-				'error' => $l->t('PHP module %s not installed.', array('iconv')),
-				'hint' => $moduleHint
-			);
-			$webServerRestart = true;
-		}
-		if (!function_exists('simplexml_load_string')) {
-			$errors[] = array(
-				'error' => $l->t('PHP module %s not installed.', array('SimpleXML')),
-				'hint' => $moduleHint
-			);
-			$webServerRestart = true;
-		}
+
 		if (version_compare(phpversion(), '5.3.3', '<')) {
 			$errors[] = array(
 				'error' => $l->t('PHP %s or higher is required.', '5.3.3'),
 				'hint' => $l->t('Please ask your server administrator to update PHP to the latest version.'
 					. ' Your PHP version is no longer supported by ownCloud and the PHP community.')
-			);
-			$webServerRestart = true;
-		}
-		if (!defined('PDO::ATTR_DRIVER_NAME')) {
-			$errors[] = array(
-				'error' => $l->t('PHP module %s not installed.', array('PDO')),
-				'hint' => $moduleHint
 			);
 			$webServerRestart = true;
 		}
@@ -626,7 +611,7 @@ class OC_Util {
 	 * @return array errors array
 	 */
 	public static function checkDatabaseVersion() {
-		$l = OC_L10N::get('lib');
+		$l = \OC::$server->getL10N('lib');
 		$errors = array();
 		$dbType = \OC_Config::getValue('dbtype', 'sqlite');
 		if ($dbType === 'pgsql') {
@@ -707,7 +692,7 @@ class OC_Util {
 	 * @return array arrays with error messages and hints
 	 */
 	public static function checkDataDirectoryPermissions($dataDirectory) {
-		$l = OC_L10N::get('lib');
+		$l = \OC::$server->getL10N('lib');
 		$errors = array();
 		if (self::runningOnWindows()) {
 			//TODO: permissions checks for windows hosts
@@ -738,7 +723,7 @@ class OC_Util {
 	 * @return bool true if the data directory is valid, false otherwise
 	 */
 	public static function checkDataDirectoryValidity($dataDirectory) {
-		$l = OC_L10N::get('lib');
+		$l = \OC::$server->getL10N('lib');
 		$errors = array();
 		if (!file_exists($dataDirectory . '/.ocdata')) {
 			$errors[] = array(
@@ -758,8 +743,8 @@ class OC_Util {
 		foreach ($errors as $value) {
 			$parameters[$value] = true;
 		}
-		if (!empty($_POST['user'])) {
-			$parameters["username"] = $_POST['user'];
+		if (!empty($_REQUEST['user'])) {
+			$parameters["username"] = $_REQUEST['user'];
 			$parameters['user_autofocus'] = false;
 		} else {
 			$parameters["username"] = '';
@@ -862,8 +847,10 @@ class OC_Util {
 	 */
 	public static function getDefaultPageUrl() {
 		$urlGenerator = \OC::$server->getURLGenerator();
-		if (isset($_REQUEST['redirect_url'])) {
-			$location = urldecode($_REQUEST['redirect_url']);
+		// Deny the redirect if the URL contains a @
+		// This prevents unvalidated redirects like ?redirect_url=:user@domain.com
+		if (isset($_REQUEST['redirect_url']) && strpos($_REQUEST['redirect_url'], '@') === false) {
+			$location = $urlGenerator->getAbsoluteURL(urldecode($_REQUEST['redirect_url']));
 		} else {
 			$defaultPage = OC_Appconfig::getValue('core', 'defaultpage');
 			if ($defaultPage) {
@@ -905,42 +892,27 @@ class OC_Util {
 		$id = OC_Config::getValue('instanceid', null);
 		if (is_null($id)) {
 			// We need to guarantee at least one letter in instanceid so it can be used as the session_name
-			$id = 'oc' . self::generateRandomBytes(10);
+			$id = 'oc' . \OC::$server->getSecureRandom()->getLowStrengthGenerator()->generate(10, \OCP\Security\ISecureRandom::CHAR_LOWER.\OCP\Security\ISecureRandom::CHAR_DIGITS);
 			OC_Config::$object->setValue('instanceid', $id);
 		}
 		return $id;
 	}
 
 	/**
-	 * Static lifespan (in seconds) when a request token expires.
-	 *
-	 * @see OC_Util::callRegister()
-	 * @see OC_Util::isCallRegistered()
-	 * @description
-	 * Also required for the client side to compute the point in time when to
-	 * request a fresh token. The client will do so when nearly 97% of the
-	 * time span coded here has expired.
-	 */
-	public static $callLifespan = 3600; // 3600 secs = 1 hour
-
-	/**
 	 * Register an get/post call. Important to prevent CSRF attacks.
 	 *
-	 * @todo Write howto: CSRF protection guide
 	 * @return string Generated token.
 	 * @description
 	 * Creates a 'request token' (random) and stores it inside the session.
 	 * Ever subsequent (ajax) request must use such a valid token to succeed,
 	 * otherwise the request will be denied as a protection against CSRF.
-	 * The tokens expire after a fixed lifespan.
-	 * @see OC_Util::$callLifespan
 	 * @see OC_Util::isCallRegistered()
 	 */
 	public static function callRegister() {
 		// Check if a token exists
 		if (!\OC::$server->getSession()->exists('requesttoken')) {
 			// No valid token found, generate a new one.
-			$requestToken = self::generateRandomBytes(20);
+			$requestToken = \OC::$server->getSecureRandom()->getMediumStrengthGenerator()->generate(30);
 			\OC::$server->getSession()->set('requesttoken', $requestToken);
 		} else {
 			// Valid token already exists, send it
@@ -953,7 +925,6 @@ class OC_Util {
 	 * Check an ajax get/post call if the request token is valid.
 	 *
 	 * @return boolean False if request token is not set or is invalid.
-	 * @see OC_Util::$callLifespan
 	 * @see OC_Util::callRegister()
 	 */
 	public static function isCallRegistered() {
@@ -963,7 +934,6 @@ class OC_Util {
 	/**
 	 * Check an ajax get/post call if the request token is valid. Exit if not.
 	 *
-	 * @todo Write howto
 	 * @return void
 	 */
 	public static function callCheck() {
@@ -1016,7 +986,7 @@ class OC_Util {
 	 * file in the data directory and trying to access via http
 	 */
 	public static function isHtaccessWorking() {
-		if (!OC::$server->getConfig()->getSystemValue('check_for_working_htaccess', true)) {
+		if (\OC::$CLI || !OC::$server->getConfig()->getSystemValue('check_for_working_htaccess', true)) {
 			return true;
 		}
 
@@ -1051,53 +1021,6 @@ class OC_Util {
 		 * is working as required
 		 */
 		return $content !== $testContent;
-	}
-
-	/**
-	 * test if webDAV is working properly
-	 *
-	 * @return bool
-	 * @description
-	 * The basic assumption is that if the server returns 401/Not Authenticated for an unauthenticated PROPFIND
-	 * the web server it self is setup properly.
-	 *
-	 * Why not an authenticated PROPFIND and other verbs?
-	 *  - We don't have the password available
-	 *  - We have no idea about other auth methods implemented (e.g. OAuth with Bearer header)
-	 *
-	 */
-	public static function isWebDAVWorking() {
-		if (!function_exists('curl_init')) {
-			return true;
-		}
-		if (!\OC_Config::getValue("check_for_working_webdav", true)) {
-			return true;
-		}
-		$settings = array(
-			'baseUri' => OC_Helper::linkToRemote('webdav'),
-		);
-
-		$client = new \OC_DAVClient($settings);
-
-		$client->setRequestTimeout(10);
-
-		// for this self test we don't care if the ssl certificate is self signed and the peer cannot be verified.
-		$client->setVerifyPeer(false);
-		// also don't care if the host can't be verified
-		$client->setVerifyHost(0);
-
-		$return = true;
-		try {
-			// test PROPFIND
-			$client->propfind('', array('{DAV:}resourcetype'));
-		} catch (\Sabre\DAV\Exception\NotAuthenticated $e) {
-			$return = true;
-		} catch (\Exception $e) {
-			OC_Log::write('core', 'isWebDAVWorking: NO - Reason: ' . $e->getMessage() . ' (' . get_class($e) . ')', OC_Log::WARN);
-			$return = false;
-		}
-
-		return $return;
 	}
 
 	/**
@@ -1208,154 +1131,37 @@ class OC_Util {
 	 *
 	 * @param int $length of the random string
 	 * @return string
-	 * @throws Exception when no secure RNG source is available
-	 * Please also update secureRNGAvailable if you change something here
+	 * @deprecated Use \OC::$server->getSecureRandom()->getMediumStrengthGenerator()->generate($length); instead
 	 */
 	public static function generateRandomBytes($length = 30) {
-		// Try to use openssl_random_pseudo_bytes
-		if (function_exists('openssl_random_pseudo_bytes')) {
-			$pseudoByte = bin2hex(openssl_random_pseudo_bytes($length, $strong));
-			if ($strong == true) {
-				return substr($pseudoByte, 0, $length); // Truncate it to match the length
-			}
-		}
-
-		// Try to use /dev/urandom
-		if (!self::runningOnWindows()) {
-			$fp = @file_get_contents('/dev/urandom', false, null, 0, $length);
-			if ($fp !== false) {
-				$string = substr(bin2hex($fp), 0, $length);
-				return $string;
-			}
-		}
-
-		// No random numbers are better then bad random numbers
-		throw new \Exception('No secure random number generator available, please install the php-openssl extension');
+		return \OC::$server->getSecureRandom()->getMediumStrengthGenerator()->generate($length, \OCP\Security\ISecureRandom::CHAR_LOWER.\OCP\Security\ISecureRandom::CHAR_DIGITS);
 	}
 
 	/**
 	 * Checks if a secure random number generator is available
 	 *
-	 * @return bool
+	 * @return true
+	 * @deprecated Function will be removed in the future and does only return true.
 	 */
 	public static function secureRNGAvailable() {
-		// Check openssl_random_pseudo_bytes
-		if (function_exists('openssl_random_pseudo_bytes')) {
-			openssl_random_pseudo_bytes(1, $strong);
-			if ($strong == true) {
-				return true;
-			}
-		}
-
-		// Check /dev/urandom
-		if (!self::runningOnWindows()) {
-			$fp = @file_get_contents('/dev/urandom', false, null, 0, 1);
-			if ($fp !== false) {
-				return true;
-			}
-		}
-
-		return false;
+		return true;
 	}
 
 	/**
-	 * @Brief Get file content via curl.
+	 * Get URL content
 	 * @param string $url Url to get content
+	 * @deprecated Use \OC::$server->getHTTPHelper()->getUrlContent($url);
 	 * @throws Exception If the URL does not start with http:// or https://
 	 * @return string of the response or false on error
 	 * This function get the content of a page via curl, if curl is enabled.
 	 * If not, file_get_contents is used.
 	 */
 	public static function getUrlContent($url) {
-		if (strpos($url, 'http://') !== 0 && strpos($url, 'https://') !== 0) {
-			throw new Exception('$url must start with https:// or http://', 1);
+		try {
+			return \OC::$server->getHTTPHelper()->getUrlContent($url);
+		} catch (\Exception $e) {
+			throw $e;
 		}
-
-		if (function_exists('curl_init')) {
-			$curl = curl_init();
-			$max_redirects = 10;
-
-			curl_setopt($curl, CURLOPT_HEADER, 0);
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
-			curl_setopt($curl, CURLOPT_URL, $url);
-
-
-			curl_setopt($curl, CURLOPT_USERAGENT, "ownCloud Server Crawler");
-			if (OC_Config::getValue('proxy', '') != '') {
-				curl_setopt($curl, CURLOPT_PROXY, OC_Config::getValue('proxy'));
-			}
-			if (OC_Config::getValue('proxyuserpwd', '') != '') {
-				curl_setopt($curl, CURLOPT_PROXYUSERPWD, OC_Config::getValue('proxyuserpwd'));
-			}
-
-			if (ini_get('open_basedir') === '' && ini_get('safe_mode') === 'Off') {
-				curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-				curl_setopt($curl, CURLOPT_MAXREDIRS, $max_redirects);
-				$data = curl_exec($curl);
-			} else {
-				curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
-				$mr = $max_redirects;
-				if ($mr > 0) {
-					$newURL = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
-					$rcurl = curl_copy_handle($curl);
-					curl_setopt($rcurl, CURLOPT_HEADER, true);
-					curl_setopt($rcurl, CURLOPT_NOBODY, true);
-					curl_setopt($rcurl, CURLOPT_FORBID_REUSE, false);
-					curl_setopt($rcurl, CURLOPT_RETURNTRANSFER, true);
-					do {
-						curl_setopt($rcurl, CURLOPT_URL, $newURL);
-						$header = curl_exec($rcurl);
-						if (curl_errno($rcurl)) {
-							$code = 0;
-						} else {
-							$code = curl_getinfo($rcurl, CURLINFO_HTTP_CODE);
-							if ($code == 301 || $code == 302) {
-								preg_match('/Location:(.*?)\n/', $header, $matches);
-								$newURL = trim(array_pop($matches));
-							} else {
-								$code = 0;
-							}
-						}
-					} while ($code && --$mr);
-					curl_close($rcurl);
-					if ($mr > 0) {
-						curl_setopt($curl, CURLOPT_URL, $newURL);
-					}
-				}
-
-				if ($mr == 0 && $max_redirects > 0) {
-					$data = false;
-				} else {
-					$data = curl_exec($curl);
-				}
-			}
-			curl_close($curl);
-		} else {
-			$contextArray = null;
-
-			if (OC_Config::getValue('proxy', '') != '') {
-				$contextArray = array(
-					'http' => array(
-						'timeout' => 10,
-						'proxy' => OC_Config::getValue('proxy')
-					)
-				);
-			} else {
-				$contextArray = array(
-					'http' => array(
-						'timeout' => 10
-					)
-				);
-			}
-
-			$ctx = stream_context_create(
-				$contextArray
-			);
-			$data = @file_get_contents($url, 0, $ctx);
-
-		}
-		return $data;
 	}
 
 	/**
@@ -1431,13 +1237,11 @@ class OC_Util {
 	 * @return bool|string
 	 */
 	public static function normalizeUnicode($value) {
-		if (class_exists('Patchwork\PHP\Shim\Normalizer')) {
-			$normalizedValue = \Patchwork\PHP\Shim\Normalizer::normalize($value);
-			if ($normalizedValue === false) {
-				\OC_Log::write('core', 'normalizing failed for "' . $value . '"', \OC_Log::WARN);
-			} else {
-				$value = $normalizedValue;
-			}
+		$normalizedValue = normalizer_normalize($value);
+		if ($normalizedValue === null || $normalizedValue === false) {
+			\OC_Log::write('core', 'normalizing failed for "' . $value . '"', \OC_Log::WARN);
+		} else {
+			$value = $normalizedValue;
 		}
 
 		return $value;
@@ -1490,26 +1294,31 @@ class OC_Util {
 	}
 
 	/**
-	 * Check whether the instance needs to preform an upgrade
+	 * Check whether the instance needs to perform an upgrade,
+	 * either when the core version is higher or any app requires
+	 * an upgrade.
 	 *
-	 * @return bool
+	 * @param \OCP\IConfig $config
+	 * @return bool whether the core or any app needs an upgrade
 	 */
-	public static function needUpgrade() {
-		if (OC_Config::getValue('installed', false)) {
-			$installedVersion = OC_Config::getValue('version', '0.0.0');
+	public static function needUpgrade($config) {
+		if ($config->getSystemValue('installed', false)) {
+			$installedVersion = $config->getSystemValue('version', '0.0.0');
 			$currentVersion = implode('.', OC_Util::getVersion());
 			if (version_compare($currentVersion, $installedVersion, '>')) {
 				return true;
 			}
 
-			// also check for upgrades for apps
-			$apps = \OC_App::getEnabledApps();
+			// also check for upgrades for apps (independently from the user)
+			$apps = \OC_App::getEnabledApps(false, true);
+			$shouldUpgrade = false;
 			foreach ($apps as $app) {
 				if (\OC_App::shouldUpgrade($app)) {
-					return true;
+					$shouldUpgrade = true;
+					break;
 				}
 			}
-			return false;
+			return $shouldUpgrade;
 		} else {
 			return false;
 		}

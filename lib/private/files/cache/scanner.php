@@ -44,6 +44,11 @@ class Scanner extends BasicEmitter {
 	 */
 	protected $cacheActive;
 
+	/**
+	 * @var bool $useTransactions whether to use transactions
+	 */
+	protected $useTransactions = true;
+
 	const SCAN_RECURSIVE = true;
 	const SCAN_SHALLOW = false;
 
@@ -55,6 +60,16 @@ class Scanner extends BasicEmitter {
 		$this->storageId = $this->storage->getId();
 		$this->cache = $storage->getCache();
 		$this->cacheActive = !Config::getSystemValue('filesystem_cache_readonly', false);
+	}
+
+	/**
+	 * Whether to wrap the scanning of a folder in a database transaction
+	 * On default transactions are used
+	 *
+	 * @param bool $useTransactions
+	 */
+	public function setUseTransactions($useTransactions) {
+		$this->useTransactions = $useTransactions;
 	}
 
 	/**
@@ -209,6 +224,17 @@ class Scanner extends BasicEmitter {
 		return $data;
 	}
 
+	protected function getExistingChildren($path) {
+		$existingChildren = array();
+		if ($this->cache->inCache($path)) {
+			$children = $this->cache->getFolderContents($path);
+			foreach ($children as $child) {
+				$existingChildren[] = $child['name'];
+			}
+		}
+		return $existingChildren;
+	}
+
 	/**
 	 * scan all the files and folders in a folder
 	 *
@@ -224,17 +250,13 @@ class Scanner extends BasicEmitter {
 		$this->emit('\OC\Files\Cache\Scanner', 'scanFolder', array($path, $this->storageId));
 		$size = 0;
 		$childQueue = array();
-		$existingChildren = array();
-		if ($this->cache->inCache($path)) {
-			$children = $this->cache->getFolderContents($path);
-			foreach ($children as $child) {
-				$existingChildren[] = $child['name'];
-			}
-		}
+		$existingChildren = $this->getExistingChildren($path);
 		$newChildren = array();
 		if ($this->storage->is_dir($path) && ($dh = $this->storage->opendir($path))) {
 			$exceptionOccurred = false;
-			\OC_DB::beginTransaction();
+			if ($this->useTransactions) {
+				\OC_DB::beginTransaction();
+			}
 			if (is_resource($dh)) {
 				while (($file = readdir($dh)) !== false) {
 					$child = ($path) ? $path . '/' . $file : $file;
@@ -266,7 +288,9 @@ class Scanner extends BasicEmitter {
 				$child = ($path) ? $path . '/' . $childName : $childName;
 				$this->removeFromCache($child);
 			}
-			\OC_DB::commit();
+			if ($this->useTransactions) {
+				\OC_DB::commit();
+			}
 			if ($exceptionOccurred) {
 				// It might happen that the parallel scan process has already
 				// inserted mimetypes but those weren't available yet inside the transaction

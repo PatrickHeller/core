@@ -1,13 +1,21 @@
 <?php
 $TRANSLATIONS = array(
+"Unknown error" => "不明なエラー",
+"Missing recovery key password" => "復旧キーのパスワードがありません",
+"Please repeat the recovery key password" => "復旧キーのパスワードをもう一度入力",
+"Repeated recovery key password does not match the provided recovery key password" => "入力された復旧キーのパスワードが一致しません。",
 "Recovery key successfully enabled" => "リカバリ用のキーを正常に有効にしました",
-"Could not enable recovery key. Please check your recovery key password!" => "リカバリ用のキーを有効にできませんでした。リカバリ用のキーのパスワードを確認してください！",
-"Recovery key successfully disabled" => "リカバリ用のキーを正常に無効化しました",
 "Could not disable recovery key. Please check your recovery key password!" => "リカバリ用のキーを無効化できませんでした。リカバリ用のキーのパスワードを確認してください！",
+"Recovery key successfully disabled" => "リカバリ用のキーを正常に無効化しました",
+"Please provide the old recovery password" => "古い復旧キーのパスワードを入力",
+"Please provide a new recovery password" => "新しい復旧キーのパスワードを入力",
+"Please repeat the new recovery password" => "新しい復旧キーのパスワードをもう一度入力",
 "Password successfully changed." => "パスワードを変更できました。",
 "Could not change the password. Maybe the old password was not correct." => "パスワードを変更できませんでした。古いパスワードが間違っているかもしれません。",
 "Private key password successfully updated." => "秘密鍵のパスワードが正常に更新されました。",
 "Could not update the private key password. Maybe the old password was not correct." => "秘密鍵のパスワードを更新できませんでした。古いパスワードが正確でない場合があります。",
+"File recovery settings updated" => "ファイルリカバリ設定を更新しました",
+"Could not update file recovery" => "ファイルリカバリを更新できませんでした",
 "Encryption app not initialized! Maybe the encryption app was re-enabled during your session. Please try to log out and log back in to initialize the encryption app." => "セッション中に暗号化アプリを再度有効にされたため、暗号化アプリが初期化されていません。暗号化アプリを初期化するため、ログアウトしてログインしなおしてください。",
 "Your private key is not valid! Likely your password was changed outside of %s (e.g. your corporate directory). You can update your private key password in your personal settings to recover access to your encrypted files." => "プライベートキーが有効ではありません！パスワードが%sの外部で変更された(例: 共同ディレクトリ)と思われます。個人設定でプライベートキーのパスワードを更新して、暗号化ファイルへのアクセスを回復することができます。",
 "Can not decrypt this file, probably this is a shared file. Please ask the file owner to reshare the file with you." => "このファイルを復号化できません、共有ファイルの可能性があります。ファイルの所有者にお願いして、ファイルを共有しなおしてもらってください。",
@@ -37,8 +45,6 @@ $TRANSLATIONS = array(
 "Current log-in password" => "現在のログインパスワード",
 "Update Private Key Password" => "秘密鍵のパスワードを更新",
 "Enable password recovery:" => "パスワードリカバリを有効に:",
-"Enabling this option will allow you to reobtain access to your encrypted files in case of password loss" => "このオプションを有効にすると、パスワードを紛失した場合も、暗号化されたファイルに再度アクセスすることができるようになります。",
-"File recovery settings updated" => "ファイルリカバリ設定を更新しました",
-"Could not update file recovery" => "ファイルリカバリを更新できませんでした"
+"Enabling this option will allow you to reobtain access to your encrypted files in case of password loss" => "このオプションを有効にすると、パスワードを紛失した場合も、暗号化されたファイルに再度アクセスすることができるようになります。"
 );
 $PLURAL_FORMS = "nplurals=1; plural=0;";

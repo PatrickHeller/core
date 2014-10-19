@@ -38,7 +38,7 @@ abstract class Common implements \OC\Files\Storage\Storage {
 	}
 
 	/**
-	 * Remove a file of folder
+	 * Remove a file or folder
 	 *
 	 * @param string $path
 	 * @return bool
@@ -54,11 +54,11 @@ abstract class Common implements \OC\Files\Storage\Storage {
 	}
 
 	public function is_dir($path) {
-		return $this->filetype($path) == 'dir';
+		return $this->filetype($path) === 'dir';
 	}
 
 	public function is_file($path) {
-		return $this->filetype($path) == 'file';
+		return $this->filetype($path) === 'file';
 	}
 
 	public function filesize($path) {
@@ -95,7 +95,11 @@ abstract class Common implements \OC\Files\Storage\Storage {
 	}
 
 	public function isDeletable($path) {
-		return $this->isUpdatable($path);
+		if ($path === '' || $path === '/') {
+			return false;
+		}
+		$parent = dirname($path);
+		return $this->isUpdatable($parent) && $this->isUpdatable($path);
 	}
 
 	public function isSharable($path) {

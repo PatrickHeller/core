@@ -56,6 +56,7 @@ $TRANSLATIONS = array(
 "So-so password" => "Sandi lumayan",
 "Good password" => "Sandi baik",
 "Strong password" => "Sandi kuat",
+"Your web server is not yet properly setup to allow files synchronization because the WebDAV interface seems to be broken." => "Web server Anda belum dikonfigurasikan dengan baik untuk mengizinkan sinkronisasi berkas karena tampaknya antarmuka WebDAV rusak.",
 "Shared" => "Dibagikan",
 "Share" => "Bagikan",
 "Error" => "Galat",
@@ -120,15 +121,12 @@ $TRANSLATIONS = array(
 "Error favoriting" => "Galat saat memberikan sebagai favorit",
 "Error unfavoriting" => "Galat saat menghapus sebagai favorit",
 "Access forbidden" => "Akses ditolak",
-"Cloud not found" => "Cloud tidak ditemukan",
 "Hey there,\n\njust letting you know that %s shared %s with you.\nView it: %s\n\n" => "Hai,\n\nhanya supaya anda tahu bahwa %s membagikan %s dengan anda.\nLihat: %s\n\n",
 "The share will expire on %s." => "Pembagian akan berakhir pada %s.",
 "Cheers!" => "Horee!",
 "Security Warning" => "Peringatan Keamanan",
 "Your PHP version is vulnerable to the NULL Byte attack (CVE-2006-7243)" => "Versi PHP Anda rentan terhadap serangan NULL Byte (CVE-2006-7243)",
 "Please update your PHP installation to use %s securely." => "Silakan perbarui instalasi PHP anda untuk menggunakan %s dengan aman.",
-"No secure random number generator is available, please enable the PHP OpenSSL extension." => "Generator acak yang aman tidak tersedia, silakan aktifkan ekstensi OpenSSL pada PHP.",
-"Without a secure random number generator an attacker may be able to predict password reset tokens and take over your account." => "Tanpa generator acak, penyerang mungkin dapat menebak token penyetelan sandi dan mengambil alih akun Anda.",
 "Your data directory and files are probably accessible from the internet because the .htaccess file does not work." => "Kemungkinan direktori data dan berkas anda dapat diakses dari internet karena berkas .htaccess tidak berfungsi.",
 "For information how to properly configure your server, please see the <a href=\"%s\" target=\"_blank\">documentation</a>." => "Untuk informasi cara mengkonfigurasi server anda dengan benar, silakan lihat <a href=\"%s\" target=\"_blank\">dokumentasi</a>.",
 "Create an <strong>admin account</strong>" => "Buat sebuah <strong>akun admin</strong>",
@@ -143,7 +141,6 @@ $TRANSLATIONS = array(
 "Database host" => "Host basis data",
 "Finish setup" => "Selesaikan instalasi",
 "Finishing …" => "Menyelesaikan ...",
-"This application requires JavaScript to be enabled for correct operation.  Please <a href=\"http://enable-javascript.com/\" target=\"_blank\">enable JavaScript</a> and re-load this interface." => "Aplikasi ini memerlukan JavaScript yang diaktifkan untuk beroperasi dengan benar. Silahkan <a href=\"http://enable-javascript.com/\" target=\"_blank\">aktifkan JavaScript</a> and re-load this interface.",
 "%s is available. Get more information on how to update." => "%s tersedia. Dapatkan informasi lebih lanjut tentang cara memperbarui.",
 "Log out" => "Keluar",
 "Server side authentication failed!" => "Otentikasi dari sisi server gagal!",
@@ -154,8 +151,6 @@ $TRANSLATIONS = array(
 "This ownCloud instance is currently in single user mode." => "ownCloud ini sedang dalam mode pengguna tunggal.",
 "This means only administrators can use the instance." => "Ini berarti hanya administrator yang dapat menggunakan ownCloud.",
 "Contact your system administrator if this message persists or appeared unexpectedly." => "Hubungi administrator sistem anda jika pesan ini terus muncul atau muncul tiba-tiba.",
-"Thank you for your patience." => "Terima kasih atas kesabaran anda.",
-"This ownCloud instance is currently being updated, which may take a while." => "ownCloud ini sedang diperbarui, yang mungkin memakan waktu cukup lama.",
-"Please reload this page after a short time to continue using ownCloud." => "Muat ulang halaman ini setelah beberapa saat untuk tetap menggunakan ownCloud."
+"Thank you for your patience." => "Terima kasih atas kesabaran anda."
 );
 $PLURAL_FORMS = "nplurals=1; plural=0;";

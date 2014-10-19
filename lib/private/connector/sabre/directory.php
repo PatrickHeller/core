@@ -84,7 +84,7 @@ class OC_Connector_Sabre_Directory extends OC_Connector_Sabre_Node
 	 * @return void
 	 */
 	public function createDirectory($name) {
-		if (!$this->fileView->isCreatable($this->path)) {
+		if (!$this->info->isCreatable()) {
 			throw new \Sabre\DAV\Exception\Forbidden();
 		}
 
@@ -192,7 +192,10 @@ class OC_Connector_Sabre_Directory extends OC_Connector_Sabre_Node
 			throw new \Sabre\DAV\Exception\Forbidden();
 		}
 
-		$this->fileView->rmdir($this->path);
+		if (!$this->fileView->rmdir($this->path)) {
+			// assume it wasn't possible to remove due to permission issue
+			throw new \Sabre\DAV\Exception\Forbidden();
+		}
 
 	}
 
@@ -228,6 +231,15 @@ class OC_Connector_Sabre_Directory extends OC_Connector_Sabre_Node
 			$props[self::GETETAG_PROPERTYNAME] = $this->info->getEtag();
 		}
 		return $props;
+	}
+
+	/**
+	 * Returns the size of the node, in bytes
+	 *
+	 * @return int
+	 */
+	public function getSize() {
+		return $this->info->getSize();
 	}
 
 }

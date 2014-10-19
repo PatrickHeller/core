@@ -102,13 +102,16 @@ class OC_Connector_Sabre_File extends OC_Connector_Sabre_Node implements \Sabre\
 			throw new OC_Connector_Sabre_Exception_FileLocked($e->getMessage(), $e->getCode(), $e);
 		}
 
+		// if content length is sent by client:
 		// double check if the file was fully received
 		// compare expected and actual size
-		$expected = $_SERVER['CONTENT_LENGTH'];
-		$actual = $this->fileView->filesize($partFilePath);
-		if ($actual != $expected) {
-			$this->fileView->unlink($partFilePath);
-			throw new \Sabre\DAV\Exception\BadRequest('expected filesize ' . $expected . ' got ' . $actual);
+		if (isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['REQUEST_METHOD'] !== 'LOCK') {
+			$expected = $_SERVER['CONTENT_LENGTH'];
+			$actual = $this->fileView->filesize($partFilePath);
+			if ($actual != $expected) {
+				$this->fileView->unlink($partFilePath);
+				throw new \Sabre\DAV\Exception\BadRequest('expected filesize ' . $expected . ' got ' . $actual);
+			}
 		}
 
 		// rename to correct path
@@ -164,7 +167,11 @@ class OC_Connector_Sabre_File extends OC_Connector_Sabre_Node implements \Sabre\
 		if (!$this->info->isDeletable()) {
 			throw new \Sabre\DAV\Exception\Forbidden();
 		}
-		$this->fileView->unlink($this->path);
+
+		if (!$this->fileView->unlink($this->path)) {
+			// assume it wasn't possible to delete due to permissions
+			throw new \Sabre\DAV\Exception\Forbidden();
+		}
 
 		// remove properties
 		$this->removeProperties();
@@ -178,21 +185,6 @@ class OC_Connector_Sabre_File extends OC_Connector_Sabre_Node implements \Sabre\
 	 */
 	public function getSize() {
 		return $this->info->getSize();
-	}
-
-	/**
-	 * Returns the ETag for a file
-	 *
-	 * An ETag is a unique identifier representing the current version of the
-	 * file. If the file changes, the ETag MUST change.  The ETag is an
-	 * arbitrary string, but MUST be surrounded by double-quotes.
-	 *
-	 * Return null if the ETag can not effectively be determined
-	 *
-	 * @return mixed
-	 */
-	public function getETag() {
-		return '"' . $this->info->getEtag() . '"';
 	}
 
 	/**

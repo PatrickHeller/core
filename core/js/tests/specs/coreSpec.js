@@ -134,6 +134,26 @@ describe('Core base tests', function() {
 			expect(escapeHTML('This is a good string without HTML.')).toEqual('This is a good string without HTML.');
 		});
 	});
+	describe('filePath', function() {
+		beforeEach(function() {
+			OC.webroot = 'http://localhost';
+			OC.appswebroots['files'] = OC.webroot + '/apps3/files';
+		});
+		afterEach(function() {
+			delete OC.appswebroots['files'];
+		});
+
+		it('Uses a direct link for css and images,' , function() {
+			expect(OC.filePath('core', 'css', 'style.css')).toEqual('http://localhost/core/css/style.css');
+			expect(OC.filePath('files', 'css', 'style.css')).toEqual('http://localhost/apps3/files/css/style.css');
+			expect(OC.filePath('core', 'img', 'image.png')).toEqual('http://localhost/core/img/image.png');
+			expect(OC.filePath('files', 'img', 'image.png')).toEqual('http://localhost/apps3/files/img/image.png');
+		});
+		it('Routes PHP files via index.php,' , function() {
+			expect(OC.filePath('core', 'ajax', 'test.php')).toEqual('http://localhost/index.php/core/ajax/test.php');
+			expect(OC.filePath('files', 'ajax', 'test.php')).toEqual('http://localhost/index.php/apps/files/ajax/test.php');
+		});
+	});
 	describe('Link functions', function() {
 		var TESTAPP = 'testapp';
 		var TESTAPP_ROOT = OC.webroot + '/appsx/testapp';
@@ -474,6 +494,165 @@ describe('Core base tests', function() {
 				expect(OC.Util.stripTime(new Date(2014, 2, 24, 15, 4, 45, 24)))
 					.toEqual(new Date(2014, 2, 24, 0, 0, 0, 0));
 			});
+		});
+	});
+	describe('naturalSortCompare', function() {
+		// cit() will skip tests if running on PhantomJS because it has issues with
+		// localeCompare(). See https://github.com/ariya/phantomjs/issues/11063
+		//
+		// Please make sure to run these tests in Chrome/Firefox manually
+		// to make sure they run.
+		var cit = window.isPhantom?xit:it;
+
+		// must provide the same results as \OC_Util::naturalSortCompare
+		it('sorts alphabetically', function() {
+			var a = [
+				'def',
+				'xyz',
+				'abc'
+			];
+			a.sort(OC.Util.naturalSortCompare);
+			expect(a).toEqual([
+				'abc',
+				'def',
+				'xyz'
+			]);
+		});
+		cit('sorts with different casing', function() {
+			var a = [
+				'aaa',
+				'bbb',
+				'BBB',
+				'AAA'
+			];
+			a.sort(OC.Util.naturalSortCompare);
+			expect(a).toEqual([
+				'aaa',
+				'AAA',
+				'bbb',
+				'BBB'
+			]);
+		});
+		it('sorts with numbers', function() {
+			var a = [
+				'124.txt',
+				'abc1',
+				'123.txt',
+				'abc',
+				'abc2',
+				'def (2).txt',
+				'ghi 10.txt',
+				'abc12',
+				'def.txt',
+				'def (1).txt',
+				'ghi 2.txt',
+				'def (10).txt',
+				'abc10',
+				'def (12).txt',
+				'z',
+				'ghi.txt',
+				'za',
+				'ghi 1.txt',
+				'ghi 12.txt',
+				'zz',
+				'15.txt',
+				'15b.txt'
+			];
+			a.sort(OC.Util.naturalSortCompare);
+			expect(a).toEqual([
+				'15.txt',
+				'15b.txt',
+				'123.txt',
+				'124.txt',
+				'abc',
+				'abc1',
+				'abc2',
+				'abc10',
+				'abc12',
+				'def.txt',
+				'def (1).txt',
+				'def (2).txt',
+				'def (10).txt',
+				'def (12).txt',
+				'ghi.txt',
+				'ghi 1.txt',
+				'ghi 2.txt',
+				'ghi 10.txt',
+				'ghi 12.txt',
+				'z',
+				'za',
+				'zz'
+			]);
+		});
+		it('sorts with chinese characters', function() {
+			var a = [
+				'十.txt',
+				'一.txt',
+				'二.txt',
+				'十 2.txt',
+				'三.txt',
+				'四.txt',
+				'abc.txt',
+				'五.txt',
+				'七.txt',
+				'八.txt',
+				'九.txt',
+				'六.txt',
+				'十一.txt',
+				'波.txt',
+				'破.txt',
+				'莫.txt',
+				'啊.txt',
+				'123.txt'
+			];
+			a.sort(OC.Util.naturalSortCompare);
+			expect(a).toEqual([
+				'123.txt',
+				'abc.txt',
+				'一.txt',
+				'七.txt',
+				'三.txt',
+				'九.txt',
+				'二.txt',
+				'五.txt',
+				'八.txt',
+				'六.txt',
+				'十.txt',
+				'十 2.txt',
+				'十一.txt',
+				'啊.txt',
+				'四.txt',
+				'波.txt',
+				'破.txt',
+				'莫.txt'
+			]);
+		});
+		cit('sorts with umlauts', function() {
+			var a = [
+				'öh.txt',
+				'Äh.txt',
+				'oh.txt',
+				'Üh 2.txt',
+				'Üh.txt',
+				'ah.txt',
+				'Öh.txt',
+				'uh.txt',
+				'üh.txt',
+				'äh.txt'
+			];
+			a.sort(OC.Util.naturalSortCompare);
+			expect(a).toEqual([
+				'ah.txt',
+				'äh.txt',
+				'Äh.txt',
+				'oh.txt',
+				'öh.txt',
+				'Öh.txt',
+				'uh.txt',
+				'üh.txt',
+				'Üh.txt',
+				'Üh 2.txt'
+			]);
 		});
 	});
 });

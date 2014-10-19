@@ -10,7 +10,7 @@ OCP\JSON::callCheck();
 OCP\JSON::checkLoggedIn();
 OCP\JSON::checkAppEnabled('files_sharing');
 
-$l = OC_L10N::get('files_sharing');
+$l = \OC::$server->getL10N('files_sharing');
 
 // check if server admin allows to mount public links from other servers
 if (OCA\Files_Sharing\Helper::isIncomingServer2serverShareEnabled() === false) {
@@ -23,6 +23,12 @@ $remote = $_POST['remote'];
 $owner = $_POST['owner'];
 $name = $_POST['name'];
 $password = $_POST['password'];
+
+// Check for invalid name
+if(!\OCP\Util::isValidFileName($name)) {
+	\OCP\JSON::error(array('data' => array('message' => $l->t('The mountpoint name contains invalid characters.'))));
+	exit();
+}
 
 $externalManager = new \OCA\Files_Sharing\External\Manager(
 	\OC::$server->getDatabaseConnection(),

@@ -5,6 +5,7 @@ $TRANSLATIONS = array(
 "Unknown error" => "Erreur Inconnue ",
 "Could not move %s - File with this name already exists" => "Impossible de déplacer %s - Un fichier possédant ce nom existe déjà",
 "Could not move %s" => "Impossible de déplacer %s",
+"Permission denied" => "Permission refusée",
 "File name cannot be empty." => "Le nom de fichier ne peut être vide.",
 "\"%s\" is an invalid file name." => "\"%s\" n'est pas un nom de fichier valide.",
 "Invalid name, '\\', '/', '<', '>', ':', '\"', '|', '?' and '*' are not allowed." => "Nom invalide, les caractères '\\', '/', '<', '>', ':', '\"', '|', '?' et '*' ne sont pas autorisés.",
@@ -61,6 +62,7 @@ $TRANSLATIONS = array(
 "Modified" => "Modifié",
 "_%n folder_::_%n folders_" => array("%n dossier","%n dossiers"),
 "_%n file_::_%n files_" => array("%n fichier","%n fichiers"),
+"You don’t have permission to upload or create files here" => "Vous n'avez pas la permission de téléverser ou de créer des fichiers ici",
 "_Uploading %n file_::_Uploading %n files_" => array("Téléversement de %n fichier","Téléversement de %n fichiers"),
 "\"{name}\" is an invalid file name." => "\"{name}\" n'est pas un nom de fichier valide.",
 "Your storage is full, files can not be updated or synced anymore!" => "Votre espage de stockage est plein, les fichiers ne peuvent plus être téléversés ou synchronisés !",
@@ -77,19 +79,18 @@ $TRANSLATIONS = array(
 "max. possible: " => "Max. possible :",
 "Save" => "Sauvegarder",
 "WebDAV" => "WebDAV",
-"Use this address to <a href=\"%s\" target=\"_blank\">access your Files via WebDAV</a>" => "Utiliser cette adresse pour <a href=\"%s\" target=\"_blank\"> accéder à vos fichiers par WebDAV</a>",
+"Use this address to <a href=\"%s\" target=\"_blank\">access your Files via WebDAV</a>" => "Utilisez cette adresse pour <a href=\"%s\" target=\"_blank\">accéder à vos fichiers par WebDAV</a>",
 "New" => "Nouveau",
 "New text file" => "Nouveau fichier texte",
 "Text file" => "Fichier texte",
 "New folder" => "Nouveau dossier",
 "Folder" => "Dossier",
-"From link" => "Depuis le lien",
-"You don’t have permission to upload or create files here" => "Vous n'avez pas la permission de téléverser ou de créer des fichiers ici",
+"From link" => "Depuis un lien",
 "Nothing in here. Upload something!" => "Il n'y a rien ici ! Envoyez donc quelque chose :)",
 "Download" => "Télécharger",
 "Upload too large" => "Téléversement trop volumineux",
 "The files you are trying to upload exceed the maximum size for file uploads on this server." => "Les fichiers que vous essayez d'envoyer dépassent la taille maximale permise par ce serveur.",
 "Files are being scanned, please wait." => "Les fichiers sont en cours d'analyse, veuillez patienter.",
-"Currently scanning" => "Analyse en cours de traitement"
+"Currently scanning" => "Analyse en cours"
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n > 1);";

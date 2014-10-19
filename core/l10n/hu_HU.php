@@ -66,6 +66,8 @@ $TRANSLATIONS = array(
 "So-so password" => "Nem túl jó jelszó",
 "Good password" => "Jó jelszó",
 "Strong password" => "Erős jelszó",
+"Your web server is not yet properly setup to allow files synchronization because the WebDAV interface seems to be broken." => "Az Ön webkiszolgálója nincs megfelelően beállítva az állományok szinkronizálásához, mert a WebDAV-elérés úgy tűnik, nem működik.",
+"This server has no working internet connection. This means that some of the features like mounting of external storage, notifications about updates or installation of 3rd party apps don´t work. Accessing files from remote and sending of notification emails might also not work. We suggest to enable internet connection for this server if you want to have all features." => "A kiszolgálónak nem működik az internetkapcsolata. Ez azt jelenti, hogy bizonyos funkciók nem fognak működni, mint pl. külső tárolók becsatolása, automatikus frissítési értesítések vagy más fejlesztők /3rd party/ által írt alkalmazások telepítése. Az állományok távolról történő elérése valamint e-mail értesítések küldése szintén lehet, hogy nem fog működni. Javasoljuk, hogy engedélyezze a kiszolgáló internetelérését, ha az összes funkciót szeretné használni.",
 "Shared" => "Megosztott",
 "Shared with {recipients}" => "Megosztva ővelük: {recipients}",
 "Share" => "Megosztás",
@@ -140,15 +142,12 @@ $TRANSLATIONS = array(
 "Error favoriting" => "Hiba a kedvencekhez adáskor",
 "Error unfavoriting" => "Hiba a kedvencekből törléskor",
 "Access forbidden" => "A hozzáférés nem engedélyezett",
-"Cloud not found" => "A felhő nem található",
 "Hey there,\n\njust letting you know that %s shared %s with you.\nView it: %s\n\n" => "Üdv!\\n\n\\n\nÉrtesítjük, hogy %s megosztotta Önnel a következőt: %s.\\n\nItt lehet megnézni: %s\\n\n\\n",
 "The share will expire on %s." => "A megosztás lejár ekkor %s",
 "Cheers!" => "Üdv.",
 "Security Warning" => "Biztonsági figyelmeztetés",
 "Your PHP version is vulnerable to the NULL Byte attack (CVE-2006-7243)" => "Az Ön PHP verziója sebezhető a NULL bájtos támadással szemben (CVE-2006-7243)",
 "Please update your PHP installation to use %s securely." => "Kérjük frissítse a telepített PHP csomagjait, hogy biztonságos legyen az %s szolgáltatása.",
-"No secure random number generator is available, please enable the PHP OpenSSL extension." => "Nem érhető el megfelelő véletlenszám-generátor, telepíteni kellene a PHP OpenSSL kiegészítését.",
-"Without a secure random number generator an attacker may be able to predict password reset tokens and take over your account." => "Megfelelő véletlenszám-generátor hiányában egy támadó szándékú idegen képes lehet megjósolni a jelszóvisszaállító tokent, és Ön helyett belépni.",
 "Your data directory and files are probably accessible from the internet because the .htaccess file does not work." => "Az adatkönyvtár és a benne levő állományok valószínűleg közvetlenül is elérhetők az internetről, mert a .htaccess állomány nem érvényesül.",
 "For information how to properly configure your server, please see the <a href=\"%s\" target=\"_blank\">documentation</a>." => "A kiszolgáló megfelelő beállításához kérjük olvassa el a <a href=\"%sl\" target=\"_blank\">dokumentációt</a>.",
 "Create an <strong>admin account</strong>" => "<strong>Rendszergazdai belépés</strong> létrehozása",
@@ -165,7 +164,6 @@ $TRANSLATIONS = array(
 "SQLite will be used as database. For larger installations we recommend to change this." => "Adatbázisként az SQLite-ot fogjuk használni. Nagyobb telepítések esetén javasoljuk, hogy változtassa meg ezt a beállítást.",
 "Finish setup" => "A beállítások befejezése",
 "Finishing …" => "Befejezés ...",
-"This application requires JavaScript to be enabled for correct operation.  Please <a href=\"http://enable-javascript.com/\" target=\"_blank\">enable JavaScript</a> and re-load this interface." => "Az alkalmazás megfelelő működéséhez szükség van JavaScriptre. <a href=\"http://enable-javascript.com/\" target=\"_blank\">Engedélyezze a JavaScriptet</a> és frissítse az oldalt!",
 "%s is available. Get more information on how to update." => "%s rendelkezésre áll. További információ a frissítéshez.",
 "Log out" => "Kilépés",
 "Server side authentication failed!" => "A szerveroldali hitelesítés sikertelen!",
@@ -188,8 +186,6 @@ $TRANSLATIONS = array(
 "The theme %s has been disabled." => "Ez a smink: %s letiltásra került.",
 "Please make sure that the database, the config folder and the data folder have been backed up before proceeding." => "Kérjük gondoskodjon róla, hogy elmentse az adatbázist, a konfigurációs mappa és az adatamappa tartalmát, mielőtt folytatja.",
 "Start update" => "A frissítés megkezdése",
-"To avoid timeouts with larger installations, you can instead run the following command from your installation directory:" => "Nagyobb telepítések esetén úgy kerülhetők el az időtúllépések, ha inkább a következő parancsot adja ki a telepítési alkönyvtárban:",
-"This ownCloud instance is currently being updated, which may take a while." => "Az ownCloud frissítés elkezdődött, ez eltarthat egy ideig.",
-"Please reload this page after a short time to continue using ownCloud." => "Frissitse az oldalt egy kis idő múlva, ha folytatni kívánja az ownCloud használatát."
+"To avoid timeouts with larger installations, you can instead run the following command from your installation directory:" => "Nagyobb telepítések esetén úgy kerülhetők el az időtúllépések, ha inkább a következő parancsot adja ki a telepítési alkönyvtárban:"
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n != 1);";

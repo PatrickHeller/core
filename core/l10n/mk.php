@@ -102,13 +102,10 @@ $TRANSLATIONS = array(
 "Error untagging" => "Грешка при отстранување на таговите",
 "Error favoriting" => "Грешка при ",
 "Access forbidden" => "Забранет пристап",
-"Cloud not found" => "Облакот не е најден",
 "Hey there,\n\njust letting you know that %s shared %s with you.\nView it: %s\n\n" => "Здраво,\n\nСамо да ве известам дека  %s shared %s with you.\nView it: %s\n\n",
 "Cheers!" => "Поздрав!",
 "Security Warning" => "Безбедносно предупредување",
 "Your PHP version is vulnerable to the NULL Byte attack (CVE-2006-7243)" => "Вашата верзија на PHP е ранлива на NULL Byte attack (CVE-2006-7243)",
-"No secure random number generator is available, please enable the PHP OpenSSL extension." => "Не е достапен безбеден генератор на случајни броеви, Ве молам озвоможете го OpenSSL PHP додатокот.",
-"Without a secure random number generator an attacker may be able to predict password reset tokens and take over your account." => "Без сигурен генератор на случајни броеви напаѓач може да ги предвиди жетоните за ресетирање на лозинка и да преземе контрола врз Вашата сметка. ",
 "Your data directory and files are probably accessible from the internet because the .htaccess file does not work." => "Вашиот директориум со податоци и датотеки се веројатно достапни преку интенернт поради што .htaccess датотеката не функционира.",
 "Create an <strong>admin account</strong>" => "Направете <strong>администраторска сметка</strong>",
 "Password" => "Лозинка",
@@ -128,8 +125,6 @@ $TRANSLATIONS = array(
 "Log in" => "Најава",
 "Alternative Logins" => "Алтернативни најавувања",
 "Contact your system administrator if this message persists or appeared unexpectedly." => "Контактирајте го вашиот систем администратор до колку оваа порака продолжи да се појавува или пак се појавува ненадејно.",
-"Thank you for your patience." => "Благодариме на вашето трпение.",
-"This ownCloud instance is currently being updated, which may take a while." => "Оваа инстанца на ownCloud во моментов се надградува, што може малку да потрае.",
-"Please reload this page after a short time to continue using ownCloud." => "Повторно вчитајте ја оваа страница по кратко време за да продолжите да го користите ownCloud."
+"Thank you for your patience." => "Благодариме на вашето трпение."
 );
 $PLURAL_FORMS = "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;";

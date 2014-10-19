@@ -15,12 +15,12 @@ if (isset($_GET['users'])) {
 	$users = array(OC_User::getUser());
 }
 
-$eventSource = new OC_EventSource();
+$eventSource = \OC::$server->createEventSource();
 $listener = new ScanListener($eventSource);
 
 foreach ($users as $user) {
 	$eventSource->send('user', $user);
-	$scanner = new \OC\Files\Utils\Scanner($user);
+	$scanner = new \OC\Files\Utils\Scanner($user, \OC::$server->getDatabaseConnection());
 	$scanner->listen('\OC\Files\Utils\Scanner', 'scanFile', array($listener, 'file'));
 	$scanner->listen('\OC\Files\Utils\Scanner', 'scanFolder', array($listener, 'folder'));
 	if ($force) {
@@ -39,12 +39,12 @@ class ScanListener {
 	private $lastCount = 0;
 
 	/**
-	 * @var \OC_EventSource event source to pass events to
+	 * @var \OCP\IEventSource event source to pass events to
 	 */
 	private $eventSource;
 
 	/**
-	 * @param \OC_EventSource $eventSource
+	 * @param \OCP\IEventSource $eventSource
 	 */
 	public function __construct($eventSource) {
 		$this->eventSource = $eventSource;

@@ -16,7 +16,7 @@ $content = isset( $_REQUEST['content'] ) ? $_REQUEST['content'] : '';
 $source = isset( $_REQUEST['source'] ) ? trim($_REQUEST['source'], '/\\') : '';
 
 if($source) {
-	$eventSource=new OC_EventSource();
+	$eventSource = \OC::$server->createEventSource();
 } else {
 	OC_JSON::callCheck();
 }
@@ -46,7 +46,8 @@ function progress($notification_code, $severity, $message, $message_code, $bytes
 	}
 }
 
-$l10n = \OC_L10n::get('files');
+
+$l10n = \OC::$server->getL10N('files');
 
 $result = array(
 	'success' 	=> false,
@@ -93,7 +94,8 @@ if (\OC\Files\Filesystem::file_exists($target)) {
 }
 
 if($source) {
-	if(substr($source, 0, 8)!='https://' and substr($source, 0, 7)!='http://') {
+	$httpHelper = \OC::$server->getHTTPHelper();
+	if(!$httpHelper->isHTTPURL($source)) {
 		OCP\JSON::error(array('data' => array('message' => $l10n->t('Not a valid source'))));
 		exit();
 	}
@@ -104,7 +106,10 @@ if($source) {
 		exit();
 	}
 
-	$ctx = stream_context_create(null, array('notification' =>'progress'));
+	$source = $httpHelper->getFinalLocationOfURL($source);
+
+	$ctx = stream_context_create(\OC::$server->getHTTPHelper()->getDefaultContextArray(), array('notification' =>'progress'));
+
 	$sourceStream=@fopen($source, 'rb', false, $ctx);
 	$result = 0;
 	if (is_resource($sourceStream)) {

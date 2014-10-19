@@ -24,6 +24,7 @@
  */
 
 namespace OCA\Encryption;
+use OCA\Encryption\Exceptions\EncryptionException;
 
 /**
  * Class for common cryptography functionality
@@ -289,9 +290,9 @@ class Crypt {
 			$padded = self::addPadding($catfile);
 
 			return $padded;
-		} catch (OCA\Encryption\Exceptions\EncryptionException $e) {
-			$message = 'Could not encrypt file content (code: ' . $e->getCode . '): ';
-			\OCP\Util::writeLog('files_encryption', $message . $e->getMessage, \OCP\Util::ERROR);
+		} catch (EncryptionException $e) {
+			$message = 'Could not encrypt file content (code: ' . $e->getCode() . '): ';
+			\OCP\Util::writeLog('files_encryption', $message . $e->getMessage(), \OCP\Util::ERROR);
 			return false;
 		}
 
@@ -385,7 +386,7 @@ class Crypt {
 		// openssl_seal returns false without errors if $plainContent
 		// is empty, so trigger our own error
 		if (empty($plainContent)) {
-			throw new Exceptions\MultiKeyEncryptException('Cannot mutliKeyEncrypt empty plain content', 10);
+			throw new Exceptions\MultiKeyEncryptException('Cannot multiKeyEncrypt empty plain content', 10);
 		}
 
 		// Set empty vars to be set by openssl by reference

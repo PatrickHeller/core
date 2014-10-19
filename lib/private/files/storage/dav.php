@@ -58,7 +58,7 @@ class DAV extends \OC\Files\Storage\Common {
 				$this->root .= '/';
 			}
 		} else {
-			throw new \Exception();
+			throw new \Exception('Invalid webdav storage configuration');
 		}
 	}
 
@@ -85,7 +85,7 @@ class DAV extends \OC\Files\Storage\Common {
 		return 'webdav::' . $this->user . '@' . $this->host . '/' . $this->root;
 	}
 
-	protected function createBaseUri() {
+	public function createBaseUri() {
 		$baseUri = 'http';
 		if ($this->secure) {
 			$baseUri .= 's';
@@ -177,6 +177,8 @@ class DAV extends \OC\Files\Storage\Common {
 				curl_setopt($curl, CURLOPT_URL, $this->createBaseUri() . $this->encodePath($path));
 				curl_setopt($curl, CURLOPT_FILE, $fp);
 				curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+				curl_setopt($curl, CURLOPT_PROTOCOLS,  CURLPROTO_HTTP | CURLPROTO_HTTPS);
+				curl_setopt($curl, CURLOPT_REDIR_PROTOCOLS,  CURLPROTO_HTTP | CURLPROTO_HTTPS);
 				if ($this->secure === true) {
 					curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
 					curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
@@ -282,6 +284,8 @@ class DAV extends \OC\Files\Storage\Common {
 		curl_setopt($curl, CURLOPT_INFILESIZE, filesize($path));
 		curl_setopt($curl, CURLOPT_PUT, true);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_PROTOCOLS,  CURLPROTO_HTTP | CURLPROTO_HTTPS);
+		curl_setopt($curl, CURLOPT_REDIR_PROTOCOLS,  CURLPROTO_HTTP | CURLPROTO_HTTPS);
 		if ($this->secure === true) {
 			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
 			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
